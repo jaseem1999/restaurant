@@ -29,7 +29,7 @@ public class SecurityConfig {
         return http.build();
     }
     
-    // Create bean for BCryptPasswordEncoder
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder(12);
