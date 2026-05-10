@@ -40,9 +40,9 @@ public class DataLoader implements CommandLineRunner {
             serviceSecurity.setCreatedBy(0l);
             serviceSecurity.setCreatedAt(Instant.now());
             orderServiceSecurityRepository.save(serviceSecurity);
-            log.info("Initial login credentials for table-service have been created.");
+            log.info("Initial login credentials for order_service have been created.");
         } else {
-            log.info("Login credentials for table-service already exist. Skipping initialization.");
+            log.info("Login credentials for order_service already exist. Skipping initialization.");
         }
     }
 }

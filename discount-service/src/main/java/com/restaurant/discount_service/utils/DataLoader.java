@@ -40,9 +40,9 @@ public class DataLoader implements CommandLineRunner {
             serviceSecurity.setCreatedBy(0l);
             serviceSecurity.setCreatedAt(Instant.now());
             discountServiceSecurityRepository.save(serviceSecurity);
-            log.info("Initial login credentials for menu-service have been created.");
+            log.info("Initial login credentials for discount_service have been created.");
         } else {
-            log.info("Login credentials for menu-service already exist. Skipping initialization.");
+            log.info("Login credentials for discount_service already exist. Skipping initialization.");
         }
     }
 }
