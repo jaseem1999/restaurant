@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserCredentialRepository extends JpaRepository<UserCredential, Long> {
-    @Query("SELECT u.email AS email, u.password AS password FROM UserCredential u WHERE u.email = :email")
+    @Query("SELECT u.id as id, u.email AS email, u.password AS password FROM UserCredential u WHERE u.email = :email")
     UserCredentialProjection findByEmailProjection(String email);
 
     boolean existsByEmail(String email);
