@@ -5,61 +5,79 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret:MySecretKeyForRideKeralaApplicationThatIsLongEnoughForHS256Algorithm}")
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration:86400000}") // Default 24 hours in milliseconds
-    private int jwtExpirationMs;
+    @Value("${jwt.expiration}")
+    private long jwtExpirationDate;
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String generateToken(UserPrincipal userPrincipal) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+
+        Date currentDate = new Date();
+
+        Date expireDate =
+                new Date(currentDate.getTime() + jwtExpirationDate);
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
-                .claim("id", userPrincipal.getId())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .subject(userPrincipal.getUsername())
+                .claim("userId", userPrincipal.getId())
+                .issuedAt(currentDate)
+                .expiration(expireDate)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String getPhoneFromToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+    public String getUsernameFromToken(String token) {
+
         Claims claims = Jwts.parser()
-                .setSigningKey(key)
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
+
         return claims.getSubject();
     }
 
     public Long getUserIdFromToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+
         Claims claims = Jwts.parser()
-                .setSigningKey(key)
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.get("id", Long.class);
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("userId", Long.class);
     }
 
     public boolean validateToken(String token) {
+
         try {
-            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+
             Jwts.parser()
-                    .setSigningKey(key)
+                    .verifyWith(getSigningKey())
                     .build()
-                    .parseClaimsJws(token);
+                    .parseSignedClaims(token);
+
             return true;
-        } catch (Exception e) {
+
+        } catch (Exception ex) {
+
+            System.out.println("Invalid JWT Token: " + ex.getMessage());
+
             return false;
         }
     }
