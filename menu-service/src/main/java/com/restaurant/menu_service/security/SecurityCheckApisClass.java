@@ -47,9 +47,6 @@ public class SecurityCheckApisClass {
             String username = parts[0];
             String password = parts[1];
 
-            System.out.println(username);
-            System.out.println(password);
-
             // load stored credentials for this service (menu_service)
             ServiceSecurity security = securityRepository.findByServiceName("menu_service").orElse(null);
             if (security == null) return false;

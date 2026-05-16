@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
  * Developed by: Jaseem
  * Updated by:
  * Tested by:
+ * stage: in progress
  * Time verified by: 2026-05-16
  *
  * Description:
@@ -37,6 +38,18 @@ public class MenuCategoryController {
     private final MenuCategoryService service;
     private final SecurityCheckApisClass securityCheckApis;
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to create a new menu category. Expects a MenuCategoryDto in the request
+     * @param authorizationHeader
+     * @param dto
+     * @return
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<MenuCategoryDto>> create(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
