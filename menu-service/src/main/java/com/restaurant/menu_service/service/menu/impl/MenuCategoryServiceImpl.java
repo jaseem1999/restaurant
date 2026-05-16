@@ -1,6 +1,7 @@
 package com.restaurant.menu_service.service.menu.impl;
 
 import com.restaurant.menu_service.entity.menu.MenuCategory;
+import com.restaurant.menu_service.projection.menu.response.MenuCategoryProjection;
 import com.restaurant.menu_service.repository.menu.MenuCategoryRepository;
 import com.restaurant.menu_service.service.menu.MenuCategoryService;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +25,13 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public MenuCategory getById(Long id) {
-        return repository.findById(id).orElse(null);
+    public MenuCategoryProjection getById(Long id) {
+        return repository.findProjectedById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<MenuCategory> listByRestaurant(Long restaurantId) {
+    public List<MenuCategoryProjection> listByRestaurant(Long restaurantId) {
         return repository.findByRestaurantId(restaurantId);
     }
 

@@ -7,10 +7,9 @@ import com.restaurant.user_service.service.restaurant.IMenuCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/restaurant/menu")
 @Validated
@@ -24,6 +23,12 @@ public class MenuCategoryController {
             @RequestBody MenuCategoryRequest request
             ) {
         ApiResponse<MenuCategoryResponse> response = menuService.createMenuCategory(request);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @GetMapping("/categories/{restaurantId}")
+    public ResponseEntity<ApiResponse<List<MenuCategoryResponse>>> getMenuCategoriesByRestaurantId(Long restaurantId) {
+        ApiResponse<List<MenuCategoryResponse>> response = menuService.getMenuCategoriesByRestaurantId(restaurantId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

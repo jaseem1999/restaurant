@@ -3,6 +3,7 @@ package com.restaurant.menu_service.controller.menu;
 import com.restaurant.menu_service.dto.ApiResponse;
 import com.restaurant.menu_service.dto.menu.MenuCategoryDto;
 import com.restaurant.menu_service.entity.menu.MenuCategory;
+import com.restaurant.menu_service.projection.menu.response.MenuCategoryProjection;
 import com.restaurant.menu_service.security.SecurityCheckApisClass;
 import com.restaurant.menu_service.service.menu.MenuCategoryService;
 import lombok.RequiredArgsConstructor;
@@ -73,12 +74,25 @@ public class MenuCategoryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
         }
-        MenuCategory category = service.getById(id);
+        MenuCategoryProjection category = service.getById(id);
         if (category == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, false, "Not found", HttpStatus.NOT_FOUND));
-        return ResponseEntity.ok(new ApiResponse<>(toDto(category), true, "OK", HttpStatus.OK));
+        return ResponseEntity.ok(new ApiResponse<>(fromProjection(category), true, "OK", HttpStatus.OK));
     }
 
-    @GetMapping
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to list menu categories for a given restaurant. Accepts an optional restaurantId query parameter.
+     * If restaurantId is not provided, it may return all categories or an empty list based on service implementation.
+     * @param authorizationHeader
+     * @param restaurantId
+     * @return
+     */
+    @GetMapping("/by-restaurant")
     public ResponseEntity<ApiResponse<List<MenuCategoryDto>>> listByRestaurant(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestParam(required = false) Long restaurantId) {
@@ -87,8 +101,8 @@ public class MenuCategoryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
         }
-        List<MenuCategory> list = service.listByRestaurant(restaurantId);
-        List<MenuCategoryDto> dtos = list.stream().map(this::toDto).collect(Collectors.toList());
+        List<MenuCategoryProjection> list = service.listByRestaurant(restaurantId);
+        List<MenuCategoryDto> dtos = list.stream().map(this::fromProjection).collect(Collectors.toList());
         return ResponseEntity.ok(new ApiResponse<>(dtos, true, "OK", HttpStatus.OK));
     }
 
@@ -150,6 +164,21 @@ public class MenuCategoryController {
         c.setCreatedBy(dto.getCreatedBy());
         c.setUpdatedBy(dto.getUpdatedBy());
         return c;
+    }
+
+    private MenuCategoryDto fromProjection(MenuCategoryProjection p) {
+        if (p == null) return null;
+        MenuCategoryDto dto = new MenuCategoryDto();
+        dto.setCategoryId(p.getCategoryId());
+        dto.setName(p.getName());
+        dto.setDescription(p.getDescription());
+        dto.setImage(p.getImage());
+        dto.setDisplayOrder(p.getDisplayOrder());
+        dto.setActive(p.getActive());
+        dto.setRestaurantId(p.getRestaurantId());
+        dto.setCreatedBy(p.getCreatedBy());
+        dto.setUpdatedBy(p.getUpdatedBy());
+        return dto;
     }
 }
 

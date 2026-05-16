@@ -7,6 +7,8 @@ import com.restaurant.user_service.dto.menu.response.MenuCategoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MenuService implements IMenuCategoryService{
@@ -16,5 +18,10 @@ public class MenuService implements IMenuCategoryService{
     @Override
     public ApiResponse<MenuCategoryResponse> createMenuCategory(MenuCategoryRequest request) {
         return menuClient.createMenuCategory(request);
+    }
+
+    @Override
+    public ApiResponse<List<MenuCategoryResponse>> getMenuCategoriesByRestaurantId(Long restaurantId) {
+        return menuClient.getMenuCategoriesByRestaurantId(restaurantId);
     }
 }
