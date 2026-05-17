@@ -4,7 +4,6 @@ import com.restaurant.user_service.dto.ApiResponse;
 import com.restaurant.user_service.dto.login.request.LoginRequest;
 import com.restaurant.user_service.dto.login.response.LoginResponse;
 import com.restaurant.user_service.dto.organisation.registration.request.OrganisationRegistrationRequest;
-import com.restaurant.user_service.dto.user_credential.UserCredentialDto;
 import com.restaurant.user_service.entity.organization.Organization;
 import com.restaurant.user_service.entity.user.Roles;
 import com.restaurant.user_service.entity.user.UserCredential;
@@ -27,8 +26,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
