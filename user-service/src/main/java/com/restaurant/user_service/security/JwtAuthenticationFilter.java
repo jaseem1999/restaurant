@@ -28,6 +28,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private Long currentUserID;
 
+    private String email;
+
+    public String getCurrentUserEmail() {
+        return email;
+    }
+
     public Long getCurrentUserID (){
         return currentUserID;
     }
@@ -48,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (!token.isBlank()) {
 
-                    String email = jwtTokenProvider.getUsernameFromToken(token);
+                    email = jwtTokenProvider.getUsernameFromToken(token);
                     currentUserID = jwtTokenProvider.getUserIdFromToken(token);
 
                     if (email != null &&

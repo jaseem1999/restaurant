@@ -65,6 +65,18 @@ public class MenuCategoryController {
         return new ResponseEntity<>(new ApiResponse<>(toDto(created), true, "Created", HttpStatus.CREATED), HttpStatus.CREATED);
     }
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to get a menu category by its ID. Returns a MenuCategoryDto wrapped in ApiResponse.
+     * @param authorizationHeader
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<MenuCategoryDto>> getById(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
@@ -106,6 +118,19 @@ public class MenuCategoryController {
         return ResponseEntity.ok(new ApiResponse<>(dtos, true, "OK", HttpStatus.OK));
     }
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to update an existing menu category. Expects a MenuCategoryDto in the request body and the category ID in the path variable. Returns the updated category as a MenuCategoryDto wrapped in ApiResponse. If the category with the given ID does not exist, returns a 404 Not Found response. If the update is successful, returns a 200 OK response with the updated category.
+     * @param authorizationHeader
+     * @param id
+     * @param dto
+     * @return
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<MenuCategoryDto>> update(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
@@ -121,6 +146,18 @@ public class MenuCategoryController {
         return ResponseEntity.ok(new ApiResponse<>(toDto(updated), true, "Updated", HttpStatus.OK));
     }
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to delete a menu category by its ID. If the category with the given ID does not exist, returns a 404 Not Found response. If the deletion is successful, returns a 204 No Content response.
+     * @param authorizationHeader
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
