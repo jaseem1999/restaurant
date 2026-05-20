@@ -167,8 +167,9 @@ public class MenuCategoryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
         }
-        service.delete(id);
-        return ResponseEntity.ok(new ApiResponse<>(null, true, "Deleted", HttpStatus.NO_CONTENT));
+        boolean isDeleted=service.delete(id);
+        if (!isDeleted) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, false, "Not found", HttpStatus.NOT_FOUND));
+        return ResponseEntity.ok(new ApiResponse<>(null, true, "Deleted successfully", HttpStatus.OK));
     }
 
     private MenuCategoryDto toDto(MenuCategory c) {

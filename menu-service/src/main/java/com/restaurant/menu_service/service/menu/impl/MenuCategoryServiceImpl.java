@@ -51,8 +51,12 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     }
 
     @Override
-    public void delete(Long id) {
+    public boolean delete(Long id) {
+        if (!repository.existsById(id)) {
+            return false;
+        }
         repository.deleteById(id);
+        return true;
     }
 }
 

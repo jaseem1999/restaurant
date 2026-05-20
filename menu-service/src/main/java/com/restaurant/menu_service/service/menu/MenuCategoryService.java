@@ -10,6 +10,6 @@ public interface MenuCategoryService {
     MenuCategoryProjection getById(Long id);
     List<MenuCategoryProjection> listByRestaurant(Long restaurantId);
     MenuCategory update(Long id, MenuCategory category);
-    void delete(Long id);
+    boolean delete(Long id);
 }
 

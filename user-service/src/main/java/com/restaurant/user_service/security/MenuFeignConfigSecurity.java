@@ -9,6 +9,17 @@ import org.springframework.context.annotation.Configuration;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+
+/**
+ * Developed by: Jaseem
+ * Updated by:
+ * Tested by: Jaseem
+ * stage: completed
+ * Time verified by: 2026-05-16
+ * Description:
+ * Configuration class for Feign client to add Basic Authentication header when communicating with the Menu Service.
+ * It reads the username and password from application properties, encodes them in Base64, and adds the Authorization header to each outgoing request made by the Feign client.
+ */
 @Configuration
 @Slf4j
 public class MenuFeignConfigSecurity {
