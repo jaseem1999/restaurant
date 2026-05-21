@@ -15,6 +15,7 @@ public interface UserCredentialRepository extends JpaRepository<UserCredential, 
     @Query(value = """
     SELECT 
         u.id as id,
+        u.organization_id as restaurantId,
         u.email as email,
         u.password as password,
         GROUP_CONCAT(r.role) as roles

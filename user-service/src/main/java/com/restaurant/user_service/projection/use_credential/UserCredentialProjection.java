@@ -1,7 +1,5 @@
 package com.restaurant.user_service.projection.use_credential;
 
-import java.util.List;
-
 public interface UserCredentialProjection {
     Long getId();
 
@@ -10,4 +8,6 @@ public interface UserCredentialProjection {
     String getPassword();
 
     String getRoles();
+
+    Long getRestaurantId();
 }

@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/register-restaurant").hasRole("SUPER_ADMIN")
                 .requestMatchers("/api/restaurant/register-admin").hasRole("RESTAURANT_OWNER")
                 .requestMatchers("/api/restaurant/admin/**").hasRole("RESTAURANT_ADMIN")
+                    .requestMatchers("/restaurant/menu/**").authenticated()
                 .anyRequest().permitAll()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
