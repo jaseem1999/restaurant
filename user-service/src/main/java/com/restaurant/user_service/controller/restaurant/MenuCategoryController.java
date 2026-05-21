@@ -56,12 +56,11 @@ public class MenuCategoryController {
      * Time verified by: 2026-05-16
      * Description:
      * Endpoint to retrieve all menu categories for a specific restaurant. Expects a restaurantId as a path variable and returns a list of MenuCategoryResponse wrapped in an ApiResponse.
-     * @param restaurantId
      * @return
      */
-    @GetMapping("/categories/{restaurantId}")
-    public ResponseEntity<ApiResponse<List<MenuCategoryResponse>>> getMenuCategoriesByRestaurantId(Long restaurantId) {
-        ApiResponse<List<MenuCategoryResponse>> response = menuService.getMenuCategoriesByRestaurantId(restaurantId);
+    @GetMapping("/categories/restaurantId")
+    public ResponseEntity<ApiResponse<List<MenuCategoryResponse>>> getMenuCategoriesByRestaurantId() {
+        ApiResponse<List<MenuCategoryResponse>> response = menuService.getMenuCategoriesByRestaurantId();
         return new ResponseEntity<>(response, response.getStatus());
     }
 

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,6 +74,8 @@ public class MenuItemAddonController {
         a.setAdditionalPreparationTime(dto.getAdditionalPreparationTime());
         a.setAdditionalCalories(dto.getAdditionalCalories());
         a.setAvailable(dto.getAvailable());
+        a.setCreatedAt(Instant.now());
+        a.setCreatedBy(dto.getCreatedBy());
         return a;
     }
 }

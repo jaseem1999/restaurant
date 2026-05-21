@@ -10,7 +10,7 @@ import java.util.List;
 public interface IMenuCategoryService {
     ApiResponse<MenuCategoryResponse> createMenuCategory(MenuCategoryRequest request);
 
-    ApiResponse<List<MenuCategoryResponse>> getMenuCategoriesByRestaurantId(Long restaurantId);
+    ApiResponse<List<MenuCategoryResponse>> getMenuCategoriesByRestaurantId();
 
     ApiResponse<MenuCategoryResponse> getMenuCategoryById(Long categoryId);
 

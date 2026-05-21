@@ -39,17 +39,21 @@ public class MenuService implements IMenuCategoryService {
     }
 
     @Override
-    public ApiResponse<List<MenuCategoryResponse>> getMenuCategoriesByRestaurantId(Long restaurantId) {
-
+    public ApiResponse<List<MenuCategoryResponse>> getMenuCategoriesByRestaurantId() {
+        UserCredentialProjection userCredential = userCredentialRepository.findUserCredentialByEmail(jwtAuthenticationFilter.getCurrentUserEmail())
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException(
+                        "User credentials not found for email: " + jwtAuthenticationFilter.getCurrentUserEmail()
+                ));
         try {
-            return menuClient.getMenuCategoriesByRestaurantId(restaurantId);
+
+            return menuClient.getMenuCategoriesByRestaurantId(userCredential.getRestaurantId());
 
         } catch (FeignException.NotFound ex) {
 
             return new ApiResponse<>(
                     null,
                     false,
-                    "Menu categories not found for restaurant id: " + restaurantId ,
+                    "Menu categories not found for restaurant id: " + userCredential.getRestaurantId(),
                     HttpStatus.NOT_FOUND
             );
 
