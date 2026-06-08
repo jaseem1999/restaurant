@@ -25,7 +25,8 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").authenticated()
                         // menu APIs should be open
                         .requestMatchers("/api/menu/categories/**").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api/menu/items/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

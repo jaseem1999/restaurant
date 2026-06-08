@@ -2,7 +2,9 @@ package com.restaurant.menu_service.controller.menu;
 
 import com.restaurant.menu_service.dto.ApiResponse;
 import com.restaurant.menu_service.dto.menu.MenuItemDto;
+import com.restaurant.menu_service.entity.menu.MenuCategory;
 import com.restaurant.menu_service.entity.menu.MenuItem;
+import com.restaurant.menu_service.security.SecurityCheckApisClass;
 import com.restaurant.menu_service.service.menu.MenuItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,10 +19,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MenuItemController {
     private final MenuItemService service;
+    private final SecurityCheckApisClass securityCheckApis;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<MenuItemDto>> create(@RequestBody MenuItemDto dto) {
+    public ResponseEntity<ApiResponse<MenuItemDto>> create(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @RequestBody MenuItemDto dto) {
+        boolean isAuthorised=securityCheckApis.checkApi(authorizationHeader);
+        if (!isAuthorised) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
+        }
         MenuItem item = fromDto(dto);
+        item.setCreatedBy(dto.getCreatedBy());
         MenuItem created = service.create(item);
         return new ResponseEntity<>(new ApiResponse<>(toDto(created), true, "Created", HttpStatus.CREATED), HttpStatus.CREATED);
     }
@@ -33,8 +43,14 @@ public class MenuItemController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<MenuItemDto>>> list(@RequestParam(required = false) Long restaurantId,
-                                                               @RequestParam(required = false) Long categoryId) {
+    public ResponseEntity<ApiResponse<List<MenuItemDto>>> list(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @RequestParam(required = false) Long restaurantId,
+            @RequestParam(required = false) Long categoryId) {
+        boolean isAuthorised=securityCheckApis.checkApi(authorizationHeader);
+        if (!isAuthorised) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
+        }
         List<MenuItem> items;
         if (categoryId != null) {
             items = service.listByCategory(categoryId);
@@ -94,6 +110,14 @@ public class MenuItemController {
         m.setFeatured(dto.getFeatured());
         m.setTaxPercentage(dto.getTaxPercentage());
         m.setRestaurantId(dto.getRestaurantId());
+        
+        // Set category with ID from DTO; service will look up and validate the category exists
+        if (dto.getCategoryId() != null) {
+            MenuCategory category = new MenuCategory();
+            category.setId(dto.getCategoryId());
+            m.setCategory(category);
+        }
+        
         return m;
     }
 }

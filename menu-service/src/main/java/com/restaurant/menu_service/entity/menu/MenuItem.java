@@ -17,6 +17,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
+@ToString
 @Table(name = "menu_item")
 public class MenuItem extends BaseEntity {
 
