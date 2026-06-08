@@ -87,15 +87,19 @@ public class MenuItemService implements IMenuItemService {
     }
 
     @Override
-    public ApiResponse<List<MenuItemsResponse>> getMenuItemsByRestaurant(Long restaurantId) {
+    public ApiResponse<List<MenuItemsResponse>> getMenuItemsByRestaurant() {
+        UserCredentialProjection userCredential = userCredentialRepository.findUserCredentialByEmail(jwtAuthenticationFilter.getCurrentUserEmail())
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException(
+                        "User credentials not found for email: " + jwtAuthenticationFilter.getCurrentUserEmail()
+                ));
         try {
-            return menuClient.getMenuItemsByRestaurant(restaurantId);
+            return menuClient.getMenuItemsByRestaurant(userCredential.getRestaurantId());
         }catch (FeignException.NotFound ex) {
 
             return new ApiResponse<>(
                     null,
                     false,
-                    "Menu item not found for restaurant id: " + restaurantId,
+                    "Menu item not found for restaurant id: " + userCredential.getRestaurantId(),
                     HttpStatus.NOT_FOUND
             );
 

@@ -34,9 +34,9 @@ public class MenuItemController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(path = "/restaurant/{restaurantId}", produces = "application/json")
-    public ResponseEntity<ApiResponse<List<MenuItemsResponse>>> getMenuItemsByRestaurant(@Valid @Min(1) @PathVariable Long restaurantId) {
-        ApiResponse<List<MenuItemsResponse>> response = menuItemService.getMenuItemsByRestaurant(restaurantId);
+    @GetMapping(path = "/restaurant", produces = "application/json")
+    public ResponseEntity<ApiResponse<List<MenuItemsResponse>>> getMenuItemsByRestaurant() {
+        ApiResponse<List<MenuItemsResponse>> response = menuItemService.getMenuItemsByRestaurant();
         return new ResponseEntity<>(response, response.getStatus());
     }
 

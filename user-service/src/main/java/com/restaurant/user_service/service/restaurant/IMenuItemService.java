@@ -13,5 +13,5 @@ public interface IMenuItemService {
 
     ApiResponse<List<MenuItemsResponse>> getMenuItemsByCategory(Long categoryId);
 
-    ApiResponse<List<MenuItemsResponse>> getMenuItemsByRestaurant(@Valid @Min(1) Long restaurantId);
+    ApiResponse<List<MenuItemsResponse>> getMenuItemsByRestaurant();
 }
