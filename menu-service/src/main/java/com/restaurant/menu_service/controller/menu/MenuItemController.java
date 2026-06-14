@@ -4,6 +4,9 @@ import com.restaurant.menu_service.dto.ApiResponse;
 import com.restaurant.menu_service.dto.menu.MenuItemDto;
 import com.restaurant.menu_service.entity.menu.MenuCategory;
 import com.restaurant.menu_service.entity.menu.MenuItem;
+import com.restaurant.menu_service.entity.menu.enums.FoodType;
+import com.restaurant.menu_service.entity.menu.enums.ItemType;
+import com.restaurant.menu_service.projection.menu.response.MenuItemProjection;
 import com.restaurant.menu_service.security.SecurityCheckApisClass;
 import com.restaurant.menu_service.service.menu.MenuItemService;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +39,14 @@ public class MenuItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<MenuItemDto>> getById(@PathVariable Long id) {
-        MenuItem item = service.getById(id);
+    public ResponseEntity<ApiResponse<MenuItemDto>> getById(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable Long id) {
+        boolean isAuthorised=securityCheckApis.checkApi(authorizationHeader);
+        if (!isAuthorised) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
+        }
+        MenuItemProjection item = service.getById(id);
         if (item == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, false, "Not found", HttpStatus.NOT_FOUND));
         return ResponseEntity.ok(new ApiResponse<>(toDto(item), true, "OK", HttpStatus.OK));
     }
@@ -51,7 +60,7 @@ public class MenuItemController {
         if (!isAuthorised) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
         }
-        List<MenuItem> items;
+        List<MenuItemProjection> items;
         if (categoryId != null) {
             items = service.listByCategory(categoryId);
         } else {
@@ -62,7 +71,13 @@ public class MenuItemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MenuItemDto>> update(@PathVariable Long id, @RequestBody MenuItemDto dto) {
+    public ResponseEntity<ApiResponse<MenuItemDto>> update(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable Long id, @RequestBody MenuItemDto dto) {
+        boolean isAuthorised=securityCheckApis.checkApi(authorizationHeader);
+        if (!isAuthorised) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
+        }
         MenuItem item = fromDto(dto);
         MenuItem updated = service.update(id, item);
         if (updated == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, false, "Not found", HttpStatus.NOT_FOUND));
@@ -95,6 +110,28 @@ public class MenuItemController {
         return dto;
     }
 
+    private MenuItemDto toDto(MenuItemProjection p) {
+        if (p == null) return null;
+        MenuItemDto dto = new MenuItemDto();
+        dto.setItemId(p.getId());
+        dto.setItemName(p.getItemName());
+        dto.setDescription(p.getDescription());
+        dto.setItemType(p.getItemType() != null ? p.getItemType().name() : null);
+        dto.setFoodType(p.getFoodType() != null ? p.getFoodType().name() : null);
+        dto.setBasePrice(p.getBasePrice());
+        dto.setPreparationTime(p.getPreparationTime());
+        dto.setCalories(p.getCalories());
+        dto.setCategoryId(p.getCategoryId());
+        dto.setImage(p.getImage());
+        dto.setAvailable(p.getAvailable());
+        dto.setFeatured(p.getFeatured());
+        dto.setTaxPercentage(p.getTaxPercentage());
+        dto.setRestaurantId(p.getRestaurantId());
+        dto.setCreatedBy(p.getCreatedBy());
+        dto.setUpdatedBy(p.getUpdatedBy());
+        return dto;
+    }
+
     private MenuItem fromDto(MenuItemDto dto) {
         if (dto == null) return null;
         MenuItem m = new MenuItem();
@@ -103,6 +140,8 @@ public class MenuItemController {
         m.setDescription(dto.getDescription());
         // enums mapping omitted for brevity; assume service handles string values or set null
         m.setBasePrice(dto.getBasePrice());
+        m.setItemType(dto.getItemType() != null ? Enum.valueOf(ItemType.class, dto.getItemType()) : null);
+        m.setFoodType(dto.getFoodType() != null ? Enum.valueOf(FoodType.class, dto.getFoodType()) : null);
         m.setPreparationTime(dto.getPreparationTime());
         m.setCalories(dto.getCalories());
         m.setImage(dto.getImage());

@@ -39,7 +39,7 @@ public class MenuItem extends BaseEntity {
 
     private Integer preparationTime;
 
-    private Integer calories;
+    private Long calories;
 
     private String image;
 

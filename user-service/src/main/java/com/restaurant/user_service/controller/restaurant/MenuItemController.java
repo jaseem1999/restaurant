@@ -2,6 +2,7 @@ package com.restaurant.user_service.controller.restaurant;
 
 import com.restaurant.user_service.dto.ApiResponse;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemRequest;
+import com.restaurant.user_service.dto.menuitems.request.MenuItemUpdateRequest;
 import com.restaurant.user_service.dto.menuitems.response.MenuItemsResponse;
 import com.restaurant.user_service.service.restaurant.IMenuItemService;
 import jakarta.validation.Valid;
@@ -20,7 +21,7 @@ import java.util.List;
 public class MenuItemController {
     private final IMenuItemService menuItemService;
 
-    @PostMapping(path = "/create", consumes = "application/json")
+    @PostMapping(path = "/create", produces = "application/json")
     public ResponseEntity<ApiResponse<MenuItemsResponse>> saveMenuItem(
             @Valid @RequestBody MenuItemRequest request
             ) {
@@ -37,6 +38,18 @@ public class MenuItemController {
     @GetMapping(path = "/restaurant", produces = "application/json")
     public ResponseEntity<ApiResponse<List<MenuItemsResponse>>> getMenuItemsByRestaurant() {
         ApiResponse<List<MenuItemsResponse>> response = menuItemService.getMenuItemsByRestaurant();
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @GetMapping(path = "/id", produces = "application/json")
+    public ResponseEntity<ApiResponse<MenuItemsResponse>> getMenuItemsByItemId(@RequestParam Long itemId) {
+        ApiResponse<MenuItemsResponse> response = menuItemService.getMenuItemsById(itemId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @PutMapping(path = "/update", produces = "application/json")
+    public ResponseEntity<ApiResponse<MenuItemsResponse>> Update(@Valid @RequestBody MenuItemUpdateRequest request) {
+        ApiResponse<MenuItemsResponse> response = menuItemService.update(request);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
