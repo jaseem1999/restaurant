@@ -17,6 +17,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+/**
+ * MenuItemController
+ *
+ * Developed by: Jaseem
+ * Updated by:
+ * Tested by:
+ * stage: in progress
+ * Time verified by: 2026-05-16
+ *
+ * Description:
+ * REST controller that exposes CRUD operations for menu items.
+ * Accepts and returns DTOs wrapped in ApiResponse to avoid exposing
+ * internal entity structures directly.
+ */
 @RestController
 @RequestMapping("/api/menu/items")
 @RequiredArgsConstructor
@@ -24,6 +39,18 @@ public class MenuItemController {
     private final MenuItemService service;
     private final SecurityCheckApisClass securityCheckApis;
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to create a new menu item. Expects a MenuItemDto in the request
+     * @param authorizationHeader
+     * @param dto
+     * @return
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<MenuItemDto>> create(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
@@ -38,6 +65,18 @@ public class MenuItemController {
         return new ResponseEntity<>(new ApiResponse<>(toDto(created), true, "Created", HttpStatus.CREATED), HttpStatus.CREATED);
     }
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to retrieve a menu item by its ID. Returns a MenuItemDto wrapped in an ApiResponse.
+     * @param authorizationHeader
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<MenuItemDto>> getById(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
@@ -51,6 +90,20 @@ public class MenuItemController {
         return ResponseEntity.ok(new ApiResponse<>(toDto(item), true, "OK", HttpStatus.OK));
     }
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to list menu items, optionally filtered by restaurantId or categoryId.
+     * Returns a list of MenuItemDto wrapped in an ApiResponse.
+     * @param authorizationHeader
+     * @param restaurantId
+     * @param categoryId
+     * @return
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<MenuItemDto>>> list(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
@@ -70,6 +123,20 @@ public class MenuItemController {
         return ResponseEntity.ok(new ApiResponse<>(dtos, true, "OK", HttpStatus.OK));
     }
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to update an existing menu item. Expects a MenuItemDto in the request body.
+     * Returns the updated MenuItemDto wrapped in an ApiResponse.
+     * @param authorizationHeader
+     * @param id
+     * @param dto
+     * @return
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<MenuItemDto>> update(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
@@ -84,6 +151,19 @@ public class MenuItemController {
         return ResponseEntity.ok(new ApiResponse<>(toDto(updated), true, "Updated", HttpStatus.OK));
     }
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to delete a menu item by its ID and restaurant ID. Returns a 204 No Content response if successful, or a 404 Not Found response if the item does not exist.
+     * @param authorizationHeader
+     * @param id
+     * @param restaurantId
+     * @return
+     */
     @DeleteMapping("/{id}/restaurant/{restaurantId}")
     public ResponseEntity<ApiResponse<Void>> delete(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
