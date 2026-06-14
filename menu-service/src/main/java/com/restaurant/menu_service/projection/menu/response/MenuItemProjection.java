@@ -29,7 +29,7 @@ public interface MenuItemProjection {
     FoodType getFoodType();
     BigDecimal getBasePrice();
     Integer getPreparationTime();
-    Long getCalories();
+    Integer getCalories();
     Long getCategoryId();
     String getImage();
     Boolean getAvailable();

@@ -13,7 +13,7 @@ public class MenuItemDto {
     private String foodType;
     private BigDecimal basePrice;
     private Integer preparationTime;
-    private Long calories;
+    private Integer calories;
     private String image;
     private Boolean available;
     private Boolean featured;
