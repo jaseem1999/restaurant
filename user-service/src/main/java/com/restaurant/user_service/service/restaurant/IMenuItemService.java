@@ -19,4 +19,6 @@ public interface IMenuItemService {
     ApiResponse<MenuItemsResponse> getMenuItemsById(Long itemId);
 
     ApiResponse<MenuItemsResponse> update(@Valid MenuItemUpdateRequest request);
+
+    ApiResponse<Void> deleteMenuItem(@Valid @Min(1) Long itemId);
 }

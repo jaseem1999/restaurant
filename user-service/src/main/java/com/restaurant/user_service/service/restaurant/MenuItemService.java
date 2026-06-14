@@ -173,4 +173,34 @@ public class MenuItemService implements IMenuItemService {
         }
     }
 
+    @Override
+    public ApiResponse<Void> deleteMenuItem(Long itemId) {
+        UserCredentialProjection userCredential = userCredentialRepository.findUserCredentialByEmail(jwtAuthenticationFilter.getCurrentUserEmail())
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException(
+                        "User credentials not found for email: " + jwtAuthenticationFilter.getCurrentUserEmail()
+                ));
+        try {
+            return menuClient.deleteMenuItem(itemId,userCredential.getRestaurantId());
+        } catch (FeignException.NotFound ex) {
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Menu item not found this id: " + itemId + " for restaurant id: " + userCredential.getRestaurantId(),
+                    HttpStatus.NOT_FOUND
+            );
+
+        } catch (FeignException ex) {
+            throw new RuntimeException("Menu service error");
+        } catch (Exception ex) {
+            log.error("Error deleting menu item: {}", ex.getMessage());
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Failed to delete menu item: " + ex.getMessage(),
+                    null
+            );
+        }
+    }
+
+
 }

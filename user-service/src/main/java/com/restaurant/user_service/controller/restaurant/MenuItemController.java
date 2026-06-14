@@ -53,4 +53,10 @@ public class MenuItemController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    @DeleteMapping("/delete/{itemId}")
+    public ResponseEntity<ApiResponse<Void>> deleteMenuItem(@Valid @Min(1) @PathVariable Long itemId) {
+        ApiResponse<Void> response = menuItemService.deleteMenuItem(itemId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
 }

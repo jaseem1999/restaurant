@@ -48,4 +48,7 @@ public interface MenuClient {
     @PutMapping("/api/menu/items/{id}")
     ApiResponse<MenuItemsResponse> updateMenuItem(
             @PathVariable Long id, @RequestBody MenuItemUpdateRequest request);
+
+    @DeleteMapping("/api/menu/items/{id}/restaurant/{restaurantId}")
+    ApiResponse<Void> deleteMenuItem(@PathVariable Long id, @PathVariable Long restaurantId);
 }

@@ -84,9 +84,20 @@ public class MenuItemController {
         return ResponseEntity.ok(new ApiResponse<>(toDto(updated), true, "Updated", HttpStatus.OK));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
-        service.delete(id);
+    @DeleteMapping("/{id}/restaurant/{restaurantId}")
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable Long id,
+            @PathVariable Long restaurantId
+    ) {
+        boolean isAuthorised=securityCheckApis.checkApi(authorizationHeader);
+        if (!isAuthorised) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
+        }
+        String value=service.delete(id, restaurantId);
+        if (!"TRUE".equals(value)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, false, value, HttpStatus.NOT_FOUND));
+        }
         return ResponseEntity.ok(new ApiResponse<>(null, true, "Deleted", HttpStatus.NO_CONTENT));
     }
 

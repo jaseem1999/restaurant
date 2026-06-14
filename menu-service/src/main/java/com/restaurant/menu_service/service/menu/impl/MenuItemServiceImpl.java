@@ -26,11 +26,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public MenuItem create(MenuItem item) {
-
-        log.warn("Menu item details: {}", item);
-
         item.setCreatedAt(Instant.now());
-        
         // Validate category is provided
         if (item.getCategory() == null || item.getCategory().getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Menu category is required for menu item creation");
@@ -90,8 +86,12 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
-    public void delete(Long id) {
+    public String delete(Long id, Long restaurantId) {
+        if (!repository.existsByIdAndRestaurantId(id, restaurantId)) {
+            return "Menu item not found with id: " + id + " for restaurant id: " + restaurantId;
+        }
         repository.deleteById(id);
+        return "TRUE";
     }
 }
 

@@ -11,6 +11,6 @@ public interface MenuItemService {
     List<MenuItemProjection> listByRestaurant(Long restaurantId);
     List<MenuItemProjection> listByCategory(Long categoryId);
     MenuItem update(Long id, MenuItem item);
-    void delete(Long id);
+    String delete(Long id, Long restaurantId);
 }
 
