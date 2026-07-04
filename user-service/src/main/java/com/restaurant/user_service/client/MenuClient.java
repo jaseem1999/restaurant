@@ -59,4 +59,7 @@ public interface MenuClient {
 
     @GetMapping("/api/menu/addons")
     ApiResponse<List<MenuItemAddonResponse>> addOnGetByItemId(@RequestParam Long menuItemId);
+
+    @GetMapping("/api/menu/addons/{id}")
+    ApiResponse<MenuItemAddonResponse> addOnGetById(@PathVariable Long id);
 }

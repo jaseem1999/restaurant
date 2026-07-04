@@ -79,7 +79,36 @@ public class MenuAddonService implements IMenuAddonService{
             throw new RuntimeException("Menu service error");
         }
         catch (Exception ex) {
-            log.error("Error saving menu add on: {}", ex.getMessage());
+            log.error("Error menu add on: {}", ex.getMessage());
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Failed to save addon: " + ex.getMessage(),
+                    null
+            );
+        }
+    }
+
+    @Override
+    public ApiResponse<MenuItemAddonResponse> getById(Long id) {
+        try {
+            return menuClient.addOnGetById(id);
+        }catch (FeignException.NotFound ex) {
+
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Menu add on not found this id" ,
+                    HttpStatus.NOT_FOUND
+            );
+
+        }
+        catch (FeignException ex) {
+            log.error("Feign error while saving menu add on: {}", ex.getMessage());
+            throw new RuntimeException("Menu service error");
+        }
+        catch (Exception ex) {
+            log.error("Error menu add on: {}", ex.getMessage());
             return new ApiResponse<>(
                     null,
                     false,

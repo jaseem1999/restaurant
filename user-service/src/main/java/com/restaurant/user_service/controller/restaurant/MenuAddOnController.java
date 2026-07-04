@@ -36,4 +36,13 @@ public class MenuAddOnController {
         ApiResponse<List<MenuItemAddonResponse>> response = iMenuAddonService.getByItemId(itemId);
         return new ResponseEntity<>(response,response.getStatus());
     }
+    @GetMapping(path = "{id}")
+    public ResponseEntity<ApiResponse<MenuItemAddonResponse>> getById(
+            @PathVariable("id") @Min(1) @Valid Long id
+    ){
+        ApiResponse<MenuItemAddonResponse> response = iMenuAddonService.getById(id);
+        return new ResponseEntity<>(response,response.getStatus());
+    }
+
+
 }

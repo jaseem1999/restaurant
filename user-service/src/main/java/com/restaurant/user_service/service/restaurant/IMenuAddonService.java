@@ -12,4 +12,6 @@ public interface IMenuAddonService {
     ApiResponse<MenuItemAddonResponse> add(MenuItemAddonRequest request);
 
     ApiResponse<List<MenuItemAddonResponse>> getByItemId(@Min(1) @Valid Long itemId);
+
+    ApiResponse<MenuItemAddonResponse> getById(@Min(1) @Valid Long id);
 }
