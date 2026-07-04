@@ -1,7 +1,7 @@
 package com.restaurant.menu_service.service.menu;
 
 import com.restaurant.menu_service.entity.menu.MenuItem;
-import com.restaurant.menu_service.projection.menu.response.MenuItemProjection;
+import com.restaurant.menu_service.projection.items.MenuItemProjection;
 
 import java.util.List;
 

@@ -1,8 +1,7 @@
-package com.restaurant.menu_service.projection.menu.response;
+package com.restaurant.menu_service.projection.items;
 
 import com.restaurant.menu_service.entity.menu.enums.FoodType;
 import com.restaurant.menu_service.entity.menu.enums.ItemType;
-import org.hibernate.dialect.LobMergeStrategy;
 
 import java.math.BigDecimal;
 

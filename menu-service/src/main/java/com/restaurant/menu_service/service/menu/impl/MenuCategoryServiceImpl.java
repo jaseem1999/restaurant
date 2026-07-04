@@ -1,7 +1,7 @@
 package com.restaurant.menu_service.service.menu.impl;
 
 import com.restaurant.menu_service.entity.menu.MenuCategory;
-import com.restaurant.menu_service.projection.menu.response.MenuCategoryProjection;
+import com.restaurant.menu_service.projection.menu.MenuCategoryProjection;
 import com.restaurant.menu_service.repository.menu.MenuCategoryRepository;
 import com.restaurant.menu_service.service.menu.MenuCategoryService;
 import lombok.RequiredArgsConstructor;

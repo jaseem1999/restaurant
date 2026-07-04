@@ -1,6 +1,7 @@
 package com.restaurant.menu_service.service.menu.impl;
 
 import com.restaurant.menu_service.entity.menu.MenuItemAddon;
+import com.restaurant.menu_service.projection.addon.MenuAddonProjection;
 import com.restaurant.menu_service.repository.menu.MenuItemAddonRepository;
 import com.restaurant.menu_service.service.menu.MenuItemAddonService;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +23,13 @@ public class MenuItemAddonServiceImpl implements MenuItemAddonService {
 
     @Override
     @Transactional(readOnly = true)
-    public MenuItemAddon getById(Long id) {
-        return repository.findById(id).orElse(null);
+    public MenuAddonProjection getById(Long id) {
+        return repository.findByIdProjection(id).orElse(null);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<MenuItemAddon> listByMenuItem(Long menuItemId) {
+    public List<MenuAddonProjection> listByMenuItem(Long menuItemId) {
         return repository.findByMenuItemId(menuItemId);
     }
 

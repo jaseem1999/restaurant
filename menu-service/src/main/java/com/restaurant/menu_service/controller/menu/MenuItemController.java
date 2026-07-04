@@ -6,7 +6,7 @@ import com.restaurant.menu_service.entity.menu.MenuCategory;
 import com.restaurant.menu_service.entity.menu.MenuItem;
 import com.restaurant.menu_service.entity.menu.enums.FoodType;
 import com.restaurant.menu_service.entity.menu.enums.ItemType;
-import com.restaurant.menu_service.projection.menu.response.MenuItemProjection;
+import com.restaurant.menu_service.projection.items.MenuItemProjection;
 import com.restaurant.menu_service.security.SecurityCheckApisClass;
 import com.restaurant.menu_service.service.menu.MenuItemService;
 import lombok.RequiredArgsConstructor;

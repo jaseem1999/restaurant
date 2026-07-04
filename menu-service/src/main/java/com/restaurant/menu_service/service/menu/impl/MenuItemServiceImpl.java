@@ -2,7 +2,7 @@ package com.restaurant.menu_service.service.menu.impl;
 
 import com.restaurant.menu_service.entity.menu.MenuCategory;
 import com.restaurant.menu_service.entity.menu.MenuItem;
-import com.restaurant.menu_service.projection.menu.response.MenuItemProjection;
+import com.restaurant.menu_service.projection.items.MenuItemProjection;
 import com.restaurant.menu_service.repository.menu.MenuCategoryRepository;
 import com.restaurant.menu_service.repository.menu.MenuItemRepository;
 import com.restaurant.menu_service.service.menu.MenuItemService;
