@@ -2,6 +2,7 @@ package com.restaurant.menu_service.controller.menu;
 
 import com.restaurant.menu_service.dto.ApiResponse;
 import com.restaurant.menu_service.dto.menu.MenuItemAddonDto;
+import com.restaurant.menu_service.entity.menu.MenuItem;
 import com.restaurant.menu_service.entity.menu.MenuItemAddon;
 import com.restaurant.menu_service.projection.addon.MenuAddonProjection;
 import com.restaurant.menu_service.security.SecurityCheckApisClass;
@@ -120,6 +121,7 @@ public class MenuItemAddonController {
         if (dto == null) return null;
         MenuItemAddon a = new MenuItemAddon();
         a.setId(dto.getAddonId());
+
         a.setAddonName(dto.getAddonName());
         a.setPrice(dto.getPrice());
         a.setAdditionalPreparationTime(dto.getAdditionalPreparationTime());
@@ -127,6 +129,11 @@ public class MenuItemAddonController {
         a.setAvailable(dto.getAvailable());
         a.setCreatedAt(Instant.now());
         a.setCreatedBy(dto.getCreatedBy());
+        if (dto.getMenuItemId() != null){
+            MenuItem item = new MenuItem();
+            item.setId(dto.getMenuItemId());
+            a.setMenuItem(item);
+        }
         return a;
     }
 }
