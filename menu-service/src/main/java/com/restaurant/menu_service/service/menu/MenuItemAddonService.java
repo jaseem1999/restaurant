@@ -10,6 +10,6 @@ public interface MenuItemAddonService {
     MenuAddonProjection getById(Long id);
     List<MenuAddonProjection> listByMenuItem(Long menuItemId);
     MenuItemAddon update(Long id, MenuItemAddon addon);
-    void delete(Long id);
+    String delete(Long rid,Long id);
 }
 

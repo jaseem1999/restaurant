@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -37,19 +38,30 @@ public class MenuItemAddonServiceImpl implements MenuItemAddonService {
 
     @Override
     public MenuItemAddon update(Long id, MenuItemAddon addon) {
+
         return repository.findById(id).map(existing -> {
+            if (addon.getMenuItem().getId() != null)
+                existing.setMenuItem(addon.getMenuItem());
             existing.setAddonName(addon.getAddonName());
             existing.setPrice(addon.getPrice());
             existing.setAdditionalPreparationTime(addon.getAdditionalPreparationTime());
             existing.setAdditionalCalories(addon.getAdditionalCalories());
             existing.setAvailable(addon.getAvailable());
+            existing.setUpdatedBy(addon.getUpdatedBy());
+            existing.setUpdatedAt(Instant.now());
             return repository.save(existing);
         }).orElse(null);
     }
 
     @Override
-    public void delete(Long id) {
+    public String delete(Long rid, Long id) {
+        MenuItemAddon addon = repository.findById(id).orElse(null);
+        if (addon == null)
+            return "NOT_FOUND";
+        if (!Objects.equals(addon.getMenuItem().getRestaurantId(), rid))
+            return "RID";
         repository.deleteById(id);
+        return "SUCCESS";
     }
 }
 

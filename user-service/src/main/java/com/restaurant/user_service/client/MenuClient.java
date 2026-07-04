@@ -5,6 +5,7 @@ import com.restaurant.user_service.dto.menu.request.MenuCategoryRequest;
 import com.restaurant.user_service.dto.menu.request.MenuCategoryUpdateRequest;
 import com.restaurant.user_service.dto.menu.response.MenuCategoryResponse;
 import com.restaurant.user_service.dto.menuaddon.request.MenuItemAddonRequest;
+import com.restaurant.user_service.dto.menuaddon.request.MenuItemAddonUpdateRequest;
 import com.restaurant.user_service.dto.menuaddon.response.MenuItemAddonResponse;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemRequest;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemUpdateRequest;
@@ -62,4 +63,10 @@ public interface MenuClient {
 
     @GetMapping("/api/menu/addons/{id}")
     ApiResponse<MenuItemAddonResponse> addOnGetById(@PathVariable Long id);
+
+    @PutMapping("/api/menu/addons/{id}")
+    ApiResponse<MenuItemAddonResponse> addOnUpdate( @PathVariable Long id,@RequestBody MenuItemAddonUpdateRequest request);
+
+    @DeleteMapping("/api/menu/addons/{restaurantId}/{id}")
+    ApiResponse<Void> addOnDelete(@PathVariable Long restaurantId,@PathVariable Long id);
 }

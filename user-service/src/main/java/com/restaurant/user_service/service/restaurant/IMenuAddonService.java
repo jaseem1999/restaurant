@@ -2,6 +2,7 @@ package com.restaurant.user_service.service.restaurant;
 
 import com.restaurant.user_service.dto.ApiResponse;
 import com.restaurant.user_service.dto.menuaddon.request.MenuItemAddonRequest;
+import com.restaurant.user_service.dto.menuaddon.request.MenuItemAddonUpdateRequest;
 import com.restaurant.user_service.dto.menuaddon.response.MenuItemAddonResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -14,4 +15,8 @@ public interface IMenuAddonService {
     ApiResponse<List<MenuItemAddonResponse>> getByItemId(@Min(1) @Valid Long itemId);
 
     ApiResponse<MenuItemAddonResponse> getById(@Min(1) @Valid Long id);
+
+    ApiResponse<MenuItemAddonResponse> update(@Valid MenuItemAddonUpdateRequest request);
+
+    ApiResponse<Void> delete(Long id);
 }

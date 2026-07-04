@@ -2,6 +2,7 @@ package com.restaurant.user_service.controller.restaurant;
 
 import com.restaurant.user_service.dto.ApiResponse;
 import com.restaurant.user_service.dto.menuaddon.request.MenuItemAddonRequest;
+import com.restaurant.user_service.dto.menuaddon.request.MenuItemAddonUpdateRequest;
 import com.restaurant.user_service.dto.menuaddon.response.MenuItemAddonResponse;
 import com.restaurant.user_service.service.restaurant.IMenuAddonService;
 import jakarta.validation.Valid;
@@ -44,5 +45,20 @@ public class MenuAddOnController {
         return new ResponseEntity<>(response,response.getStatus());
     }
 
+    @PutMapping(path = "update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse<MenuItemAddonResponse>> update(@Valid
+                                                                         @RequestBody MenuItemAddonUpdateRequest request){
+        ApiResponse<MenuItemAddonResponse> response= iMenuAddonService.update(request);
+        return new ResponseEntity<>(response,response.getStatus());
+
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @PathVariable Long id
+    ){
+        ApiResponse<Void> response = iMenuAddonService.delete(id);
+        return new ResponseEntity<>(response,response.getStatus());
+    }
 
 }

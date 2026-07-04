@@ -91,17 +91,18 @@ public class MenuItemAddonController {
         return ResponseEntity.ok(new ApiResponse<>(toDto(updated), true, "Updated", HttpStatus.OK));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{restaurantId}/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable Long restaurantId,
             @PathVariable Long id) {
         boolean isApiVerified =securityCheckApis.checkApi(authorizationHeader);
         if (!isApiVerified) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
         }
-        service.delete(id);
-        return ResponseEntity.ok(new ApiResponse<>(null, true, "Deleted", HttpStatus.NO_CONTENT));
+        String result=service.delete(restaurantId, id);
+        return ResponseEntity.ok(new ApiResponse<>(null, true, result, HttpStatus.NO_CONTENT));
     }
 
     private MenuItemAddonDto toDto(MenuItemAddon a) {
@@ -121,7 +122,8 @@ public class MenuItemAddonController {
         if (dto == null) return null;
         MenuItemAddon a = new MenuItemAddon();
         a.setId(dto.getAddonId());
-
+        if (dto.getUpdatedBy() != null)
+            a.setUpdatedBy(dto.getUpdatedBy());
         a.setAddonName(dto.getAddonName());
         a.setPrice(dto.getPrice());
         a.setAdditionalPreparationTime(dto.getAdditionalPreparationTime());
