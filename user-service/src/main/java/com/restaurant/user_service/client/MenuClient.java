@@ -7,6 +7,9 @@ import com.restaurant.user_service.dto.menu.response.MenuCategoryResponse;
 import com.restaurant.user_service.dto.menuaddon.request.MenuItemAddonRequest;
 import com.restaurant.user_service.dto.menuaddon.request.MenuItemAddonUpdateRequest;
 import com.restaurant.user_service.dto.menuaddon.response.MenuItemAddonResponse;
+import com.restaurant.user_service.dto.menuimage.request.MenuItemImageRequest;
+import com.restaurant.user_service.dto.menuimage.request.MenuItemImageUpdateRequest;
+import com.restaurant.user_service.dto.menuimage.response.MenuItemImageResponse;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemRequest;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemUpdateRequest;
 import com.restaurant.user_service.dto.menuitems.response.MenuItemsResponse;
@@ -69,4 +72,21 @@ public interface MenuClient {
 
     @DeleteMapping("/api/menu/addons/{restaurantId}/{id}")
     ApiResponse<Void> addOnDelete(@PathVariable Long restaurantId,@PathVariable Long id);
+
+    @PostMapping("/api/menu/images")
+    ApiResponse<MenuItemImageResponse> createMenuItemImage(@RequestBody  MenuItemImageRequest menuItemImageRequest);
+
+    @GetMapping("/api/menu/images")
+    ApiResponse<List<MenuItemImageResponse>> listMenuItemImages(@RequestParam Long menuItemId);
+
+    @PutMapping("/api/menu/images/{id}")
+    ApiResponse<MenuItemImageResponse> updateMenuItemImage(
+            @PathVariable("id") Long id,
+            @RequestBody MenuItemImageUpdateRequest request);
+
+    @GetMapping("/api/menu/images/{id}")
+    ApiResponse<MenuItemImageResponse> getMenuItemImageById(@PathVariable Long id);
+
+    @DeleteMapping("/api/menu/images/{id}")
+    ApiResponse<String> deleteMenuItemImage(@PathVariable Long id);
 }
