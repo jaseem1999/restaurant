@@ -45,7 +45,7 @@ public interface TableAssignmentRepository extends JpaRepository<TableAssignment
             @Param("restaurantId") Long restaurantId
     );
 
-    @Query("SELECT ta FROM TableAssignment ta WHERE ta.tableId = :tableId " +
+    @Query("SELECT ta FROM TableAssignment ta WHERE ta.table.id = :tableId " +
             "AND ta.active = true " +
             "AND ta.vacatedAt IS NULL")
     List<TableAssignment> findActiveAssignmentsByTable(
