@@ -1,5 +1,6 @@
 package com.restaurant.user_service.dto.menuitems.request;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -8,7 +9,9 @@ import java.math.BigDecimal;
 public class MenuItemRequest {
     private String itemName;
     private String description;
+    @Pattern(regexp = "FOOD|BEVERAGE|DESSERT|APPETIZER", message = "Invalid item type. Must be one of: FOOD, BEVERAGE, DESSERT, APPETIZER")
     private String itemType;
+    @Pattern(regexp = "VEGETARIAN|NON_VEGETARIAN|VEGAN|GLUTEN_FREE", message = "Invalid food type. Must be one of: VEGETARIAN, NON_VEGETARIAN, VEGAN, GLUTEN_FREE")
     private String foodType;
     private BigDecimal basePrice;
     private Integer preparationTime;

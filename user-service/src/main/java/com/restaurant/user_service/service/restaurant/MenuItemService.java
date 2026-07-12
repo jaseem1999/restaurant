@@ -3,6 +3,7 @@ package com.restaurant.user_service.service.restaurant;
 import com.restaurant.user_service.client.MenuClient;
 import com.restaurant.user_service.dto.ApiResponse;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemRequest;
+import com.restaurant.user_service.dto.menuitems.request.MenuItemUpdateRequest;
 import com.restaurant.user_service.dto.menuitems.response.MenuItemsResponse;
 import com.restaurant.user_service.projection.use_credential.UserCredentialProjection;
 import com.restaurant.user_service.repository.user.UserCredentialRepository;
@@ -116,4 +117,90 @@ public class MenuItemService implements IMenuItemService {
         }
 
     }
+
+    @Override
+    public ApiResponse<MenuItemsResponse> getMenuItemsById(Long id) {
+
+
+        try {
+            return menuClient.getMenuItemsById(id);
+        } catch (FeignException.NotFound ex) {
+
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Menu item not found this id: " + id,
+                    HttpStatus.NOT_FOUND
+            );
+
+        } catch (FeignException ex) {
+            throw new RuntimeException("Menu service error");
+        } catch (Exception ex) {
+            log.error("Error fetching menu items by Restaurant: {}", ex.getMessage());
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Failed to fetch menu items: " + ex.getMessage(),
+                    null
+            );
+        }
+    }
+
+    @Override
+    public ApiResponse<MenuItemsResponse> update(MenuItemUpdateRequest request) {
+
+        try {
+            return menuClient.updateMenuItem(request.getItemId(),request);
+        } catch (FeignException.NotFound ex) {
+
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Menu item not found this id: " + request.getItemId(),
+                    HttpStatus.NOT_FOUND
+            );
+
+        } catch (FeignException ex) {
+            throw new RuntimeException("Menu service error");
+        } catch (Exception ex) {
+            log.error("Error fetching menu items by Restaurant: {}", ex.getMessage());
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Failed to fetch menu items: " + ex.getMessage(),
+                    null
+            );
+        }
+    }
+
+    @Override
+    public ApiResponse<Void> deleteMenuItem(Long itemId) {
+        UserCredentialProjection userCredential = userCredentialRepository.findUserCredentialByEmail(jwtAuthenticationFilter.getCurrentUserEmail())
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException(
+                        "User credentials not found for email: " + jwtAuthenticationFilter.getCurrentUserEmail()
+                ));
+        try {
+            return menuClient.deleteMenuItem(itemId,userCredential.getRestaurantId());
+        } catch (FeignException.NotFound ex) {
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Menu item not found this id: " + itemId + " for restaurant id: " + userCredential.getRestaurantId(),
+                    HttpStatus.NOT_FOUND
+            );
+
+        } catch (FeignException ex) {
+            throw new RuntimeException("Menu service error");
+        } catch (Exception ex) {
+            log.error("Error deleting menu item: {}", ex.getMessage());
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Failed to delete menu item: " + ex.getMessage(),
+                    null
+            );
+        }
+    }
+
+
 }

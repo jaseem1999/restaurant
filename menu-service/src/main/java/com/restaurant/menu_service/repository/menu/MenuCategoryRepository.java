@@ -1,7 +1,7 @@
 package com.restaurant.menu_service.repository.menu;
 
 import com.restaurant.menu_service.entity.menu.MenuCategory;
-import com.restaurant.menu_service.projection.menu.response.MenuCategoryProjection;
+import com.restaurant.menu_service.projection.menu.MenuCategoryProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

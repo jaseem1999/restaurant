@@ -1,4 +1,4 @@
-package com.restaurant.menu_service.projection.menu.response;
+package com.restaurant.menu_service.projection.menu;
 
 /**
  * Projection for MenuCategory used by repository queries.

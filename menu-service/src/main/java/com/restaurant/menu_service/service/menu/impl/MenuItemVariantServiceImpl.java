@@ -1,12 +1,14 @@
 package com.restaurant.menu_service.service.menu.impl;
 
 import com.restaurant.menu_service.entity.menu.MenuItemVariant;
+import com.restaurant.menu_service.projection.variant.VariantProjection;
 import com.restaurant.menu_service.repository.menu.MenuItemVariantRepository;
 import com.restaurant.menu_service.service.menu.MenuItemVariantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -17,19 +19,20 @@ public class MenuItemVariantServiceImpl implements MenuItemVariantService {
 
     @Override
     public MenuItemVariant create(MenuItemVariant variant) {
+        variant.setCreatedAt(Instant.now());
         return repository.save(variant);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public MenuItemVariant getById(Long id) {
-        return repository.findById(id).orElse(null);
+    public VariantProjection getById(Long id) {
+        return repository.findByIdProjection(id).orElse(null);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<MenuItemVariant> listByMenuItem(Long menuItemId) {
-        return repository.findByMenuItemId(menuItemId);
+    public List<VariantProjection> listByMenuItem(Long menuItemId) {
+        return repository.findByMenuItemIdProjection(menuItemId);
     }
 
     @Override
@@ -37,6 +40,8 @@ public class MenuItemVariantServiceImpl implements MenuItemVariantService {
         return repository.findById(id).map(existing -> {
             existing.setVariantName(variant.getVariantName());
             existing.setPriceAdjustment(variant.getPriceAdjustment());
+            existing.setUpdatedAt(Instant.now());
+            existing.setUpdatedBy(variant.getUpdatedBy());
             existing.setAdditionalPreparationTime(variant.getAdditionalPreparationTime());
             existing.setAdditionalCalories(variant.getAdditionalCalories());
             existing.setAvailable(variant.getAvailable());
@@ -45,8 +50,12 @@ public class MenuItemVariantServiceImpl implements MenuItemVariantService {
     }
 
     @Override
-    public void delete(Long id) {
+    public String delete(Long id) {
+        if (!repository.existsById(id)) {
+            return "NOT_FOUND";
+        }
         repository.deleteById(id);
+        return "DELETED";
     }
 }
 

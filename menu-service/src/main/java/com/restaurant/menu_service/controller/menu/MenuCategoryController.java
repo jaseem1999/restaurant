@@ -3,7 +3,7 @@ package com.restaurant.menu_service.controller.menu;
 import com.restaurant.menu_service.dto.ApiResponse;
 import com.restaurant.menu_service.dto.menu.MenuCategoryDto;
 import com.restaurant.menu_service.entity.menu.MenuCategory;
-import com.restaurant.menu_service.projection.menu.response.MenuCategoryProjection;
+import com.restaurant.menu_service.projection.menu.MenuCategoryProjection;
 import com.restaurant.menu_service.security.SecurityCheckApisClass;
 import com.restaurant.menu_service.service.menu.MenuCategoryService;
 import lombok.RequiredArgsConstructor;
