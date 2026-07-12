@@ -1,14 +1,15 @@
 package com.restaurant.menu_service.service.menu;
 
 import com.restaurant.menu_service.entity.menu.MenuItemVariant;
+import com.restaurant.menu_service.projection.variant.VariantProjection;
 
 import java.util.List;
 
 public interface MenuItemVariantService {
     MenuItemVariant create(MenuItemVariant variant);
-    MenuItemVariant getById(Long id);
-    List<MenuItemVariant> listByMenuItem(Long menuItemId);
+    VariantProjection getById(Long id);
+    List<VariantProjection> listByMenuItem(Long menuItemId);
     MenuItemVariant update(Long id, MenuItemVariant variant);
-    void delete(Long id);
+    String delete(Long id);
 }
 

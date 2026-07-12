@@ -13,6 +13,9 @@ import com.restaurant.user_service.dto.menuimage.response.MenuItemImageResponse;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemRequest;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemUpdateRequest;
 import com.restaurant.user_service.dto.menuitems.response.MenuItemsResponse;
+import com.restaurant.user_service.dto.menuvariant.request.MenuItemVariantRequest;
+import com.restaurant.user_service.dto.menuvariant.request.MenuItemVariantUpdateRequest;
+import com.restaurant.user_service.dto.menuvariant.response.MenuItemVariantResponse;
 import com.restaurant.user_service.security.MenuFeignConfigSecurity;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -89,4 +92,21 @@ public interface MenuClient {
 
     @DeleteMapping("/api/menu/images/{id}")
     ApiResponse<String> deleteMenuItemImage(@PathVariable Long id);
+
+    @PostMapping("/api/menu/variants")
+    ApiResponse<MenuItemVariantResponse> createMenuItemVariant(@RequestBody MenuItemVariantRequest request);
+
+    @GetMapping("/api/menu/variants/{id}")
+    ApiResponse<MenuItemVariantResponse> getMenuItemVariantById( @PathVariable Long id);
+
+    @PutMapping("/api/menu/variants/{id}")
+    ApiResponse<MenuItemVariantResponse> updateMenuItemVariant(
+            @PathVariable Long id,
+            @RequestBody MenuItemVariantUpdateRequest request);
+
+    @GetMapping("/api/menu/variants")
+    ApiResponse<List<MenuItemVariantResponse>> getMenuItemVariantsByMenuItemId(@RequestParam Long menuItemId);
+
+    @DeleteMapping("/api/menu/variants/{id}")
+    ApiResponse<String> deleteMenuItemVariantById(@PathVariable Long id);
 }
