@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/menu/addons/**").permitAll()
                         .requestMatchers("/api/menu/images/**").permitAll()
                         .requestMatchers("/api/menu/variants/**").permitAll()
+                        .requestMatchers("/api/menu/offers/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

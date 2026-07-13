@@ -34,7 +34,7 @@ public class MenuItemVariantService implements IMenuItemVariantServices {
         request.setCreatedBy(userCredential.getId());
         try {
             return menuClient.createMenuItemVariant(request);
-        } catch (FeignException.NotFound e) {
+        } catch (FeignException.NotFound _) {
             return new ApiResponse<>(
                     null,
                     false,

@@ -13,6 +13,9 @@ import com.restaurant.user_service.dto.menuimage.response.MenuItemImageResponse;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemRequest;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemUpdateRequest;
 import com.restaurant.user_service.dto.menuitems.response.MenuItemsResponse;
+import com.restaurant.user_service.dto.menuoffer.request.MenuItemOfferRequest;
+import com.restaurant.user_service.dto.menuoffer.request.MenuItemOfferUpdateRequest;
+import com.restaurant.user_service.dto.menuoffer.response.MenuItemOfferResponse;
 import com.restaurant.user_service.dto.menuvariant.request.MenuItemVariantRequest;
 import com.restaurant.user_service.dto.menuvariant.request.MenuItemVariantUpdateRequest;
 import com.restaurant.user_service.dto.menuvariant.response.MenuItemVariantResponse;
@@ -109,4 +112,21 @@ public interface MenuClient {
 
     @DeleteMapping("/api/menu/variants/{id}")
     ApiResponse<String> deleteMenuItemVariantById(@PathVariable Long id);
+
+    @PostMapping("/api/menu/offers")
+    ApiResponse<MenuItemOfferResponse> createMenuItemOffer(@RequestBody MenuItemOfferRequest request);
+
+    @PutMapping("/api/menu/offers/{id}")
+    ApiResponse<MenuItemOfferResponse> updateMenuItemOffer(
+            @PathVariable Long id,
+            @RequestBody MenuItemOfferUpdateRequest request);
+
+    @GetMapping("/api/menu/offers/{id}")
+    ApiResponse<MenuItemOfferResponse> getMenuItemOfferById(@PathVariable Long id);
+
+    @GetMapping("/api/menu/offers")
+    ApiResponse<List<MenuItemOfferResponse>> getAllMenuItemOffers(  @RequestParam Long menuItemId,
+                                                                    @RequestParam Boolean active);
+    @DeleteMapping("/api/menu/offers/{id}")
+    ApiResponse<String> deleteMenuItemOffer(@PathVariable Long id);
 }
