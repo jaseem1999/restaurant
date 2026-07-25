@@ -6,6 +6,8 @@ import com.restaurant.table_service.dto.TableAssignmentProjection;
 import com.restaurant.table_service.dto.table_assignment.request.TableAssignmentRequest;
 import com.restaurant.table_service.entity.table.Table;
 import com.restaurant.table_service.entity.table.TableAssignment;
+import com.restaurant.table_service.entity.table.enums.ReservationStatus;
+import com.restaurant.table_service.repository.TableReservationRepository;
 import com.restaurant.table_service.request.TableAssignmentFilterRequest;
 import com.restaurant.table_service.repository.TableAssignmentRepository;
 import com.restaurant.table_service.service.impl.ITableAssignmentService;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +34,29 @@ import java.util.stream.Collectors;
 public class TableAssignmentService implements ITableAssignmentService {
 
     private final TableAssignmentRepository assignmentRepository;
-    private final ITableReservationService tableReservationService;
+    private final TableReservationRepository reservationRepository;
+
+    private boolean isTableAssigned(Long tableId, Instant checkInDateTime, Instant checkOutDateTime) {
+        log.info("Checking if table {} is assigned between {} and {}", tableId, checkInDateTime, checkOutDateTime);
+        List<TableAssignment> assignments = assignmentRepository.findByTableIdAndActive(tableId, true);
+        return assignments.stream().anyMatch(assignment -> {
+            if (assignment.getVacatedAt() == null) {
+                return true; // Table is currently assigned
+            }
+            // Check for overlapping periods
+            return !(checkInDateTime.isAfter(assignment.getVacatedAt()) || checkOutDateTime.isBefore(assignment.getAssignedAt()));
+        });
+    }
+
+    private boolean isTableReserved(Long tableId, Instant assignedAt, Instant vacatedAt) {
+        boolean isReserved = reservationRepository.findByTableIdAndStatusIn(tableId, Arrays.asList(ReservationStatus.PENDING, ReservationStatus.CONFIRMED, ReservationStatus.CHECKED_IN)).stream()
+                .anyMatch(reservation -> {
+                    Instant reservationStart = reservation.getReservationDateTime();
+                    Instant reservationEnd = reservation.getCheckOutDateTime() != null ? reservation.getCheckOutDateTime() : reservationStart.plusSeconds(3600); // Assuming 1 hour if check-out is not set
+                    return (assignedAt.isBefore(reservationEnd) && vacatedAt.isAfter(reservationStart));
+                });
+        return isReserved;
+    }
 
     @Override
     public ApiResponse<Page<TableAssignmentProjection>> getAllAssignments(Long restaurantId, Pageable pageable) {
@@ -139,7 +164,7 @@ public class TableAssignmentService implements ITableAssignmentService {
                 .notes(tableAssignmentRequest.getNotes())
                 .build();
         if (tableAssignmentRequest.getTableId() != null) {
-            boolean checkIsAlreadyReserved = tableReservationService.isTableReserved(
+            boolean checkIsAlreadyReserved = isTableReserved(
                     tableAssignmentRequest.getTableId(),
                     tableAssignmentRequest.getAssignedAt(), tableAssignmentRequest.getVacatedAt());
             log.info("Checking if table {} is already reserved for the given period: {}", tableAssignmentRequest.getTableId(), checkIsAlreadyReserved);
@@ -201,7 +226,7 @@ public class TableAssignmentService implements ITableAssignmentService {
         assignment.setCustomerId(tableAssignmentRequest.getCustomerId());
         assignment.setRestaurantId(tableAssignmentRequest.getRestaurantId());
         if (tableAssignmentRequest.getTableId() != null) {
-            boolean checkIsAlreadyReserved = tableReservationService.isTableReserved(
+            boolean checkIsAlreadyReserved = isTableReserved(
                     tableAssignmentRequest.getTableId(),
                     tableAssignmentRequest.getAssignedAt(), tableAssignmentRequest.getVacatedAt());
             if (checkIsAlreadyReserved) {

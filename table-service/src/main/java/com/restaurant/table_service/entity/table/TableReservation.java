@@ -24,7 +24,6 @@ public class TableReservation extends BaseEntity {
     @Column(nullable = false)
     private Integer guestCount;
 
-    @Column(nullable = false)
     private Long customerId;
 
     private String guestName;
