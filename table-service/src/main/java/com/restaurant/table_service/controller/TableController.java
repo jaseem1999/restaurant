@@ -2,17 +2,25 @@ package com.restaurant.table_service.controller;
 
 import com.restaurant.table_service.dto.TableDetailProjection;
 import com.restaurant.table_service.dto.TableProjection;
+import com.restaurant.table_service.dto.ApiResponse;
+import com.restaurant.table_service.dto.table.request.TableRequest;
+import com.restaurant.table_service.dto.table.response.TableResponse;
+import com.restaurant.table_service.entity.table.Table;
 import com.restaurant.table_service.entity.table.enums.TableStatus;
 import com.restaurant.table_service.request.TableFilterRequest;
-import com.restaurant.table_service.service.TableService;
+import com.restaurant.table_service.security.SecurityCheckApisClass;
+import com.restaurant.table_service.service.impl.ITableService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @Slf4j
@@ -21,78 +29,160 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TableController {
 
-    private final TableService tableService;
+    private final SecurityCheckApisClass securityCheckApisClass;
+
+    private final ITableService iTableService;
+
+    @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<ApiResponse<TableResponse>> createTable(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @Valid @RequestBody TableRequest tableRequest) {
+        if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Invalid API credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
+        ApiResponse<TableResponse> response = iTableService.createTable(fromDto(tableRequest));
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @PutMapping(path = "/update", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<ApiResponse<TableResponse>> updateTable(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @Valid @RequestBody TableRequest tableRequest) {
+        if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Invalid API credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
+        ApiResponse<TableResponse> response = iTableService.updateTable(tableRequest.getId(),fromDto(tableRequest));
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    private Table fromDto(@Valid TableRequest tableRequest) {
+        Table table =  Table.builder()
+                .tableNumber(tableRequest.getTableNumber())
+                .capacity(tableRequest.getCapacity())
+                .status(tableRequest.getTableStatus())
+                .tableType(tableRequest.getTableType())
+                .restaurantId(tableRequest.getRestaurantId())
+                .location(tableRequest.getLocation())
+                .floor(tableRequest.getFloor())
+                .section(tableRequest.getSection())
+                .active(tableRequest.getActive())
+                .notes(tableRequest.getNotes()).build();
+        if (tableRequest.getCreatedBy() != null) {
+            table.setCreatedBy(tableRequest.getCreatedBy());
+            table.setCreatedAt(Instant.now());
+        }
+
+        if (tableRequest.getUpdatedBy() != null) {
+            table.setUpdatedBy(tableRequest.getUpdatedBy());
+            table.setUpdatedAt(Instant.now());
+        }
+        return table;
+    }
 
     @GetMapping
-    public ResponseEntity<Page<TableProjection>> getAllTables(
+    public ResponseEntity<ApiResponse<Page<TableProjection>>> getAllTables(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestParam Long restaurantId,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size) {
+        if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Invalid API credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         log.info("GET /api/v1/tables - restaurantId: {}, page: {}, size: {}", restaurantId, page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<TableProjection> tables = tableService.getAllTables(restaurantId, pageable);
-        return ResponseEntity.ok(tables);
+        Page<TableProjection> tables = iTableService.getAllTables(restaurantId, pageable);
+        return new ResponseEntity<>(new ApiResponse<>(tables, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<Page<TableProjection>> getTablesByStatus(
+    public ResponseEntity<ApiResponse<Page<TableProjection>>> getTablesByStatus(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestParam Long restaurantId,
             @PathVariable TableStatus status,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size) {
+        if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Invalid API credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         log.info("GET /api/v1/tables/status/{} - restaurantId: {}", status, restaurantId);
         Pageable pageable = PageRequest.of(page, size);
-        Page<TableProjection> tables = tableService.getTablesByStatus(restaurantId, status, pageable);
-        return ResponseEntity.ok(tables);
+        Page<TableProjection> tables = iTableService.getTablesByStatus(restaurantId, status, pageable);
+        return new ResponseEntity<>(new ApiResponse<>(tables, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<Page<TableProjection>> filterTables(@RequestBody TableFilterRequest request) {
+    public ResponseEntity<ApiResponse<Page<TableProjection>>> filterTables(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @RequestBody TableFilterRequest request) {
+        if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Invalid API credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         log.info("POST /api/v1/tables/filter - {}", request);
-        Page<TableProjection> tables = tableService.filterTables(request);
-        return ResponseEntity.ok(tables);
+        Page<TableProjection> tables = iTableService.filterTables(request);
+        return new ResponseEntity<>(new ApiResponse<>(tables, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/{tableId}")
-    public ResponseEntity<TableDetailProjection> getTableById(@PathVariable Long tableId) {
+    public ResponseEntity<ApiResponse<TableDetailProjection>> getTableById(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable Long tableId) {
+        if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Invalid API credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         log.info("GET /api/v1/tables/{}", tableId);
-        TableDetailProjection table = tableService.getTableById(tableId);
-        return ResponseEntity.ok(table);
+        TableDetailProjection table = iTableService.getTableById(tableId);
+        return new ResponseEntity<>(new ApiResponse<>(table, true, "Table retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/available")
-    public ResponseEntity<List<TableProjection>> getAvailableTablesForCapacity(
+    public ResponseEntity<ApiResponse<List<TableProjection>>> getAvailableTablesForCapacity(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestParam Long restaurantId,
             @RequestParam Integer guestCount) {
+        if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Invalid API credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         log.info("GET /api/v1/tables/available - restaurantId: {}, guestCount: {}", restaurantId, guestCount);
-        List<TableProjection> tables = tableService.getAvailableTablesForCapacity(restaurantId, guestCount);
-        return ResponseEntity.ok(tables);
+        List<TableProjection> tables = iTableService.getAvailableTablesForCapacity(restaurantId, guestCount);
+        return new ResponseEntity<>(new ApiResponse<>(tables, true, "Available tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/floor/{floor}")
-    public ResponseEntity<List<TableProjection>> getTablesByFloor(
+    public ResponseEntity<ApiResponse<List<TableProjection>>> getTablesByFloor(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestParam Long restaurantId,
             @PathVariable String floor) {
+        if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Invalid API credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         log.info("GET /api/v1/tables/floor/{} - restaurantId: {}", floor, restaurantId);
-        List<TableProjection> tables = tableService.getTablesByFloor(restaurantId, floor);
-        return ResponseEntity.ok(tables);
+        List<TableProjection> tables = iTableService.getTablesByFloor(restaurantId, floor);
+        return new ResponseEntity<>(new ApiResponse<>(tables, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/section/{section}")
-    public ResponseEntity<List<TableProjection>> getTablesBySection(
+    public ResponseEntity<ApiResponse<List<TableProjection>>> getTablesBySection(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestParam Long restaurantId,
             @PathVariable String section) {
+        if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Invalid API credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         log.info("GET /api/v1/tables/section/{} - restaurantId: {}", section, restaurantId);
-        List<TableProjection> tables = tableService.getTablesBySection(restaurantId, section);
-        return ResponseEntity.ok(tables);
+        List<TableProjection> tables = iTableService.getTablesBySection(restaurantId, section);
+        return new ResponseEntity<>(new ApiResponse<>(tables, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/count-by-status")
-    public ResponseEntity<Long> getTableCountByStatus(
+    public ResponseEntity<ApiResponse<Long>> getTableCountByStatus(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestParam Long restaurantId,
             @RequestParam TableStatus status) {
+        if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Invalid API credentials", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         log.info("GET /api/v1/tables/count-by-status - restaurantId: {}, status: {}", restaurantId, status);
-        Long count = tableService.getTableCountByStatus(restaurantId, status);
-        return ResponseEntity.ok(count);
+        Long count = iTableService.getTableCountByStatus(restaurantId, status);
+        return new ResponseEntity<>(new ApiResponse<>(count, true, "Table count retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 }

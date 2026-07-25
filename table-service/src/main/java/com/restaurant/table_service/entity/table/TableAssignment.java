@@ -20,7 +20,7 @@ public class TableAssignment extends BaseEntity {
     @Column(nullable = false)
     private Long orderId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long customerId;
 
     @Column(nullable = false)

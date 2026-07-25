@@ -5,6 +5,7 @@ import com.restaurant.table_service.entity.table.enums.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 public class TableReservation extends BaseEntity {
 
     @Column(nullable = false)
-    private LocalDateTime reservationDateTime;
+    private Instant reservationDateTime;
 
     @Column(nullable = false)
     private Integer guestCount;
@@ -46,9 +47,9 @@ public class TableReservation extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String specialRequests;
 
-    private LocalDateTime checkInDateTime;
+    private Instant checkInDateTime;
 
-    private LocalDateTime checkOutDateTime;
+    private Instant checkOutDateTime;
 
     private Boolean noShow = false;
 }

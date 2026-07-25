@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ReservationProjection {
     private Long id;
-    private LocalDateTime reservationDateTime;
+    private Instant reservationDateTime;
     private Integer guestCount;
     private Long customerId;
     private String guestName;
@@ -22,7 +23,7 @@ public class ReservationProjection {
     private ReservationStatus status;
     private Long tableId;
     private String tableNumber;
-    private LocalDateTime checkInDateTime;
-    private LocalDateTime checkOutDateTime;
+    private Instant checkInDateTime;
+    private Instant checkOutDateTime;
     private Boolean noShow;
 }

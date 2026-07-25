@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ReservationDetailProjection {
     private Long id;
-    private LocalDateTime reservationDateTime;
+    private Instant reservationDateTime;
     private Integer guestCount;
     private Long customerId;
     private String guestName;
@@ -26,8 +26,8 @@ public class ReservationDetailProjection {
     private Long tableId;
     private String tableNumber;
     private String specialRequests;
-    private LocalDateTime checkInDateTime;
-    private LocalDateTime checkOutDateTime;
+    private Instant checkInDateTime;
+    private Instant checkOutDateTime;
     private Boolean noShow;
     private Instant createdAt;
     private Instant updatedAt;

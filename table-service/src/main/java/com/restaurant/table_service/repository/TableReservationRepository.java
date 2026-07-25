@@ -71,4 +71,14 @@ public interface TableReservationRepository extends JpaRepository<TableReservati
     );
 
     Long countByRestaurantIdAndStatus(Long restaurantId, ReservationStatus status);
+
+    @Query("""
+    SELECT r
+    FROM TableReservation r
+    WHERE r.table.id = :tableId
+      AND r.status IN :statuses
+    """)
+    List<TableReservation> findByTableIdAndStatusIn(
+            @Param("tableId") Long tableId,
+            @Param("statuses") List<ReservationStatus> statuses);
 }

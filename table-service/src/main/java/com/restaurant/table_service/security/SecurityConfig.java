@@ -21,8 +21,8 @@ public class SecurityConfig {
         http
             .csrf(Customizer.withDefaults())
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/admin/**").authenticated()
-                .anyRequest().permitAll()
+                .requestMatchers("/api/v1/tables/**").permitAll()
+                .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         
