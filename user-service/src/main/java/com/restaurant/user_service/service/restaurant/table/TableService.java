@@ -55,4 +55,44 @@ public class TableService implements ITableService {
             );
         }
     }
+
+    @Override
+    public ApiResponse<TableResponse> updateTable(TableRequest tableRequest) {
+        log.info("Updating table with request: {}", tableRequest);
+        UserCredentialProjection userCredential = userCredentialRepository.findUserCredentialByEmail(jwtAuthenticationFilter.getCurrentUserEmail())
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException(
+                        "User credentials not found for email: " + jwtAuthenticationFilter.getCurrentUserEmail()
+                ));
+
+        try {
+            tableRequest.setCreatedBy(null);
+            tableRequest.setUpdatedBy(userCredential.getId());
+            return tableClient.updateTable(tableRequest);
+        }catch (FeignException.NotFound _){
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Table not found for id: " + tableRequest.getId(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+        catch (FeignException.FeignClientException e){
+            log.error("Feign client exception while updating table with request: {}", tableRequest, e);
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Failed to update table: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+        catch (Exception e){
+            log.error("Exception while updating table with request: {}", tableRequest, e);
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Exception while updating table : " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }

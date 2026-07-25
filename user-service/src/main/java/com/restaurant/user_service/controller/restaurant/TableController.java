@@ -8,10 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/restaurant/table")
@@ -23,6 +20,12 @@ public class TableController {
     @PostMapping(path = "/create", produces = "application/json", consumes = "application/json")
     public ResponseEntity<ApiResponse<TableResponse>> createTable(@Valid @RequestBody TableRequest tableRequest) {
         ApiResponse<TableResponse> tableResponse = iTableService.createTable(tableRequest);
+        return new ResponseEntity<>(tableResponse, tableResponse.getStatus());
+    }
+
+    @PutMapping(path = "/update", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<ApiResponse<TableResponse>> updateTable(@Valid @RequestBody TableRequest tableRequest) {
+        ApiResponse<TableResponse> tableResponse = iTableService.updateTable(tableRequest);
         return new ResponseEntity<>(tableResponse, tableResponse.getStatus());
     }
 }

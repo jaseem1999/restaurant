@@ -106,17 +106,17 @@ public class TableService implements ITableService {
     public ApiResponse<TableResponse> updateTable(Long id, Table table) {
          com.restaurant.table_service.entity.table.Table t =tableRepository.findById(id).map(
                 tableEntity -> {
-                    tableEntity.setRestaurantId(table.getRestaurantId());
-                    tableEntity.setStatus(table.getStatus());
-                    tableEntity.setTableType(table.getTableType());
-                    tableEntity.setCapacity(table.getCapacity());
-                    tableEntity.setFloor(table.getFloor());
-                    tableEntity.setSection(table.getSection());
-                    tableEntity.setActive(table.getActive());
+                    tableEntity.setRestaurantId(table.getRestaurantId() != null ? table.getRestaurantId() : tableEntity.getRestaurantId());
+                    tableEntity.setStatus(table.getStatus() != null ? table.getStatus() : tableEntity.getStatus());
+                    tableEntity.setTableType(table.getTableType() != null ? table.getTableType() : tableEntity.getTableType());
+                    tableEntity.setCapacity(table.getCapacity() != null ? table.getCapacity() : tableEntity.getCapacity());
+                    tableEntity.setFloor(table.getFloor() != null ? table.getFloor() : tableEntity.getFloor());
+                    tableEntity.setSection(table.getSection() != null ? table.getSection() : tableEntity.getSection());
+                    tableEntity.setActive(table.getActive() != null ? table.getActive() : tableEntity.getActive());
                     tableEntity.setUpdatedAt(table.getUpdatedAt());
                     tableEntity.setUpdatedBy(table.getUpdatedBy());
-                    tableEntity.setTableNumber(table.getTableNumber());
-                    tableEntity.setLocation(table.getLocation());
+                    tableEntity.setTableNumber(table.getTableNumber() != null ? table.getTableNumber() : tableEntity.getTableNumber());
+                    tableEntity.setLocation(table.getLocation() != null ? table.getLocation() : tableEntity.getLocation());
                     try {
                        return tableRepository.save(tableEntity);
                     } catch (Exception e) {
@@ -196,6 +196,7 @@ public class TableService implements ITableService {
                 .location(table.getLocation())
                 .floor(table.getFloor())
                 .section(table.getSection())
+                .restaurantId(table.getRestaurantId())
                 .active(table.getActive())
                 .createdBy(table.getCreatedBy())
                 .updatedBy(table.getUpdatedBy())

@@ -7,4 +7,6 @@ import jakarta.validation.Valid;
 
 public interface ITableService {
     ApiResponse<TableResponse> createTable(@Valid TableRequest tableRequest);
+
+    ApiResponse<TableResponse> updateTable(@Valid TableRequest tableRequest);
 }
