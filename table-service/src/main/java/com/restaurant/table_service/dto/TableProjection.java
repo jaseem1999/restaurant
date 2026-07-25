@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,4 +23,10 @@ public class TableProjection {
     private String floor;
     private String section;
     private Boolean active;
+    private Long createdBy;
+    private Instant createdAt;
+    private Long updatedBy;
+    private Instant updatedAt;
+    private Long restaurantId;
+    private String notes;
 }

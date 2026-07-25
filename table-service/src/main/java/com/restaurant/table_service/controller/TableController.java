@@ -91,6 +91,12 @@ public class TableController {
                 .floor(projection.getFloor())
                 .section(projection.getSection())
                 .active(projection.getActive())
+                .createdBy(projection.getCreatedBy())
+                .createdAt(projection.getCreatedAt())
+                .updatedBy(projection.getUpdatedBy())
+                .updatedAt(projection.getUpdatedAt())
+                .restaurantId(projection.getRestaurantId())
+                .notes(projection.getNotes())
                 .build();
     }
 

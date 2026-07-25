@@ -154,6 +154,12 @@ public class TableService implements ITableService {
                 .floor(table.getFloor())
                 .section(table.getSection())
                 .active(table.getActive())
+                .createdBy(table.getCreatedBy())
+                .updatedBy(table.getUpdatedBy())
+                .createdAt(table.getCreatedAt())
+                .updatedAt(table.getUpdatedAt())
+                .restaurantId(table.getRestaurantId())
+                .notes(table.getNotes())
                 .build();
     }
 

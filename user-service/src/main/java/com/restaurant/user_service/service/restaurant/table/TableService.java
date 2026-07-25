@@ -11,6 +11,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
@@ -91,6 +92,34 @@ public class TableService implements ITableService {
                     null,
                     false,
                     "Exception while updating table : " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    @Override
+    public ApiResponse<Page<TableResponse>> getTables(Integer page, Integer size) {
+        UserCredentialProjection userCredential = userCredentialRepository.findUserCredentialByEmail(jwtAuthenticationFilter.getCurrentUserEmail())
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException(
+                        "User credentials not found for email: " + jwtAuthenticationFilter.getCurrentUserEmail()
+                ));
+
+        try {
+            return tableClient.getTables(userCredential.getRestaurantId(), page, size);
+        } catch (FeignException.FeignClientException e) {
+            log.error("Feign client exception while retrieving tables for restaurantId: {}, page: {}, size: {}", userCredential.getRestaurantId(), page, size, e);
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Failed to retrieve tables: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        } catch (Exception e) {
+            log.error("Exception while retrieving tables for restaurantId: {}, page: {}, size: {}", userCredential.getRestaurantId(), page, size, e);
+            return new ApiResponse<>(
+                    null,
+                    false,
+                    "Exception while retrieving tables : " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
