@@ -5,6 +5,7 @@ import com.restaurant.user_service.dto.menu.request.MenuCategoryRequest;
 import com.restaurant.user_service.dto.menu.request.MenuCategoryUpdateRequest;
 import com.restaurant.user_service.dto.menu.response.MenuCategoryResponse;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemRequest;
+import com.restaurant.user_service.dto.menuitems.request.MenuItemUpdateRequest;
 import com.restaurant.user_service.dto.menuitems.response.MenuItemsResponse;
 import com.restaurant.user_service.security.MenuFeignConfigSecurity;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -40,4 +41,14 @@ public interface MenuClient {
 
     @GetMapping("/api/menu/items")
     ApiResponse<List<MenuItemsResponse>> getMenuItemsByRestaurant(@RequestParam Long restaurantId);
+
+    @GetMapping("/api/menu/items/{id}")
+    ApiResponse<MenuItemsResponse> getMenuItemsById(@PathVariable Long id);
+
+    @PutMapping("/api/menu/items/{id}")
+    ApiResponse<MenuItemsResponse> updateMenuItem(
+            @PathVariable Long id, @RequestBody MenuItemUpdateRequest request);
+
+    @DeleteMapping("/api/menu/items/{id}/restaurant/{restaurantId}")
+    ApiResponse<Void> deleteMenuItem(@PathVariable Long id, @PathVariable Long restaurantId);
 }

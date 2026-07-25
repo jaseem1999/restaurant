@@ -4,6 +4,9 @@ import com.restaurant.menu_service.dto.ApiResponse;
 import com.restaurant.menu_service.dto.menu.MenuItemDto;
 import com.restaurant.menu_service.entity.menu.MenuCategory;
 import com.restaurant.menu_service.entity.menu.MenuItem;
+import com.restaurant.menu_service.entity.menu.enums.FoodType;
+import com.restaurant.menu_service.entity.menu.enums.ItemType;
+import com.restaurant.menu_service.projection.menu.response.MenuItemProjection;
 import com.restaurant.menu_service.security.SecurityCheckApisClass;
 import com.restaurant.menu_service.service.menu.MenuItemService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +17,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+/**
+ * MenuItemController
+ *
+ * Developed by: Jaseem
+ * Updated by:
+ * Tested by:
+ * stage: in progress
+ * Time verified by: 2026-05-16
+ *
+ * Description:
+ * REST controller that exposes CRUD operations for menu items.
+ * Accepts and returns DTOs wrapped in ApiResponse to avoid exposing
+ * internal entity structures directly.
+ */
 @RestController
 @RequestMapping("/api/menu/items")
 @RequiredArgsConstructor
@@ -21,6 +39,18 @@ public class MenuItemController {
     private final MenuItemService service;
     private final SecurityCheckApisClass securityCheckApis;
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to create a new menu item. Expects a MenuItemDto in the request
+     * @param authorizationHeader
+     * @param dto
+     * @return
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<MenuItemDto>> create(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
@@ -35,13 +65,45 @@ public class MenuItemController {
         return new ResponseEntity<>(new ApiResponse<>(toDto(created), true, "Created", HttpStatus.CREATED), HttpStatus.CREATED);
     }
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to retrieve a menu item by its ID. Returns a MenuItemDto wrapped in an ApiResponse.
+     * @param authorizationHeader
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<MenuItemDto>> getById(@PathVariable Long id) {
-        MenuItem item = service.getById(id);
+    public ResponseEntity<ApiResponse<MenuItemDto>> getById(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable Long id) {
+        boolean isAuthorised=securityCheckApis.checkApi(authorizationHeader);
+        if (!isAuthorised) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
+        }
+        MenuItemProjection item = service.getById(id);
         if (item == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, false, "Not found", HttpStatus.NOT_FOUND));
         return ResponseEntity.ok(new ApiResponse<>(toDto(item), true, "OK", HttpStatus.OK));
     }
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to list menu items, optionally filtered by restaurantId or categoryId.
+     * Returns a list of MenuItemDto wrapped in an ApiResponse.
+     * @param authorizationHeader
+     * @param restaurantId
+     * @param categoryId
+     * @return
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<MenuItemDto>>> list(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
@@ -51,7 +113,7 @@ public class MenuItemController {
         if (!isAuthorised) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
         }
-        List<MenuItem> items;
+        List<MenuItemProjection> items;
         if (categoryId != null) {
             items = service.listByCategory(categoryId);
         } else {
@@ -61,17 +123,61 @@ public class MenuItemController {
         return ResponseEntity.ok(new ApiResponse<>(dtos, true, "OK", HttpStatus.OK));
     }
 
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to update an existing menu item. Expects a MenuItemDto in the request body.
+     * Returns the updated MenuItemDto wrapped in an ApiResponse.
+     * @param authorizationHeader
+     * @param id
+     * @param dto
+     * @return
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MenuItemDto>> update(@PathVariable Long id, @RequestBody MenuItemDto dto) {
+    public ResponseEntity<ApiResponse<MenuItemDto>> update(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable Long id, @RequestBody MenuItemDto dto) {
+        boolean isAuthorised=securityCheckApis.checkApi(authorizationHeader);
+        if (!isAuthorised) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
+        }
         MenuItem item = fromDto(dto);
         MenuItem updated = service.update(id, item);
         if (updated == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, false, "Not found", HttpStatus.NOT_FOUND));
         return ResponseEntity.ok(new ApiResponse<>(toDto(updated), true, "Updated", HttpStatus.OK));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
-        service.delete(id);
+    /**
+     * Developed by: Jaseem
+     * Updated by:
+     * Tested by: Jaseem
+     * stage: completed
+     * Time verified by: 2026-05-16
+     * Description:
+     * Endpoint to delete a menu item by its ID and restaurant ID. Returns a 204 No Content response if successful, or a 404 Not Found response if the item does not exist.
+     * @param authorizationHeader
+     * @param id
+     * @param restaurantId
+     * @return
+     */
+    @DeleteMapping("/{id}/restaurant/{restaurantId}")
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable Long id,
+            @PathVariable Long restaurantId
+    ) {
+        boolean isAuthorised=securityCheckApis.checkApi(authorizationHeader);
+        if (!isAuthorised) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED));
+        }
+        String value=service.delete(id, restaurantId);
+        if (!"TRUE".equals(value)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, false, value, HttpStatus.NOT_FOUND));
+        }
         return ResponseEntity.ok(new ApiResponse<>(null, true, "Deleted", HttpStatus.NO_CONTENT));
     }
 
@@ -95,6 +201,28 @@ public class MenuItemController {
         return dto;
     }
 
+    private MenuItemDto toDto(MenuItemProjection p) {
+        if (p == null) return null;
+        MenuItemDto dto = new MenuItemDto();
+        dto.setItemId(p.getId());
+        dto.setItemName(p.getItemName());
+        dto.setDescription(p.getDescription());
+        dto.setItemType(p.getItemType() != null ? p.getItemType().name() : null);
+        dto.setFoodType(p.getFoodType() != null ? p.getFoodType().name() : null);
+        dto.setBasePrice(p.getBasePrice());
+        dto.setPreparationTime(p.getPreparationTime());
+        dto.setCalories(p.getCalories());
+        dto.setCategoryId(p.getCategoryId());
+        dto.setImage(p.getImage());
+        dto.setAvailable(p.getAvailable());
+        dto.setFeatured(p.getFeatured());
+        dto.setTaxPercentage(p.getTaxPercentage());
+        dto.setRestaurantId(p.getRestaurantId());
+        dto.setCreatedBy(p.getCreatedBy());
+        dto.setUpdatedBy(p.getUpdatedBy());
+        return dto;
+    }
+
     private MenuItem fromDto(MenuItemDto dto) {
         if (dto == null) return null;
         MenuItem m = new MenuItem();
@@ -103,6 +231,8 @@ public class MenuItemController {
         m.setDescription(dto.getDescription());
         // enums mapping omitted for brevity; assume service handles string values or set null
         m.setBasePrice(dto.getBasePrice());
+        m.setItemType(dto.getItemType() != null ? Enum.valueOf(ItemType.class, dto.getItemType()) : null);
+        m.setFoodType(dto.getFoodType() != null ? Enum.valueOf(FoodType.class, dto.getFoodType()) : null);
         m.setPreparationTime(dto.getPreparationTime());
         m.setCalories(dto.getCalories());
         m.setImage(dto.getImage());

@@ -1,12 +1,16 @@
 package com.restaurant.user_service.dto.menuitems.request;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class MenuItemRequest {
+public class MenuItemUpdateRequest {
+    @Min(1)
+    private Long itemId;
     private String itemName;
     private String description;
     @Pattern(regexp = "FOOD|BEVERAGE|DESSERT|APPETIZER", message = "Invalid item type. Must be one of: FOOD, BEVERAGE, DESSERT, APPETIZER")
@@ -20,8 +24,4 @@ public class MenuItemRequest {
     private Boolean available;
     private Boolean featured;
     private BigDecimal taxPercentage;
-    private Long restaurantId;
-    private Long categoryId;
-    private Long createdBy;
-    private Long updatedBy;
 }
