@@ -4,7 +4,7 @@ import com.restaurant.user_service.dto.ApiResponse;
 import com.restaurant.user_service.dto.menuimage.request.MenuItemImageRequest;
 import com.restaurant.user_service.dto.menuimage.request.MenuItemImageUpdateRequest;
 import com.restaurant.user_service.dto.menuimage.response.MenuItemImageResponse;
-import com.restaurant.user_service.service.restaurant.IMenuImageService;
+import com.restaurant.user_service.service.restaurant.menu.IMenuImageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

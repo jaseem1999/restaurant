@@ -197,6 +197,11 @@ public class TableService implements ITableService {
                 .floor(table.getFloor())
                 .section(table.getSection())
                 .active(table.getActive())
+                .createdBy(table.getCreatedBy())
+                .updatedBy(table.getUpdatedBy())
+                .updatedAt(table.getUpdatedAt())
+                .createdAt(table.getCreatedAt())
+                .notes(table.getNotes())
                 .build();
     }
 }

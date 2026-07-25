@@ -7,6 +7,7 @@ import com.restaurant.table_service.dto.table.request.TableRequest;
 import com.restaurant.table_service.dto.table.response.TableResponse;
 import com.restaurant.table_service.entity.table.Table;
 import com.restaurant.table_service.entity.table.enums.TableStatus;
+import com.restaurant.table_service.entity.table.enums.TableType;
 import com.restaurant.table_service.request.TableFilterRequest;
 import com.restaurant.table_service.security.SecurityCheckApisClass;
 import com.restaurant.table_service.service.impl.ITableService;
@@ -55,7 +56,7 @@ public class TableController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    private Table fromDto(@Valid TableRequest tableRequest) {
+    private Table fromDto(TableRequest tableRequest) {
         Table table =  Table.builder()
                 .tableNumber(tableRequest.getTableNumber())
                 .capacity(tableRequest.getCapacity())
@@ -79,8 +80,22 @@ public class TableController {
         return table;
     }
 
+    private TableResponse fromProjectionToDto(TableProjection projection) {
+        return TableResponse.builder()
+                .id(projection.getId())
+                .tableNumber(projection.getTableNumber())
+                .capacity(projection.getCapacity())
+                .tableStatus(projection.getStatus())
+                .tableType(projection.getTableType())
+                .location(projection.getLocation())
+                .floor(projection.getFloor())
+                .section(projection.getSection())
+                .active(projection.getActive())
+                .build();
+    }
+
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<TableProjection>>> getAllTables(
+    public ResponseEntity<ApiResponse<Page<TableResponse>>> getAllTables(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestParam Long restaurantId,
             @RequestParam(defaultValue = "0") Integer page,
@@ -91,11 +106,12 @@ public class TableController {
         log.info("GET /api/v1/tables - restaurantId: {}, page: {}, size: {}", restaurantId, page, size);
         Pageable pageable = PageRequest.of(page, size);
         Page<TableProjection> tables = iTableService.getAllTables(restaurantId, pageable);
-        return new ResponseEntity<>(new ApiResponse<>(tables, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
+        Page<TableResponse> tableResponses = tables.map(this::fromProjectionToDto);
+        return new ResponseEntity<>(new ApiResponse<>(tableResponses, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<ApiResponse<Page<TableProjection>>> getTablesByStatus(
+    public ResponseEntity<ApiResponse<Page<TableResponse>>> getTablesByStatus(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestParam Long restaurantId,
             @PathVariable TableStatus status,
@@ -107,11 +123,12 @@ public class TableController {
         log.info("GET /api/v1/tables/status/{} - restaurantId: {}", status, restaurantId);
         Pageable pageable = PageRequest.of(page, size);
         Page<TableProjection> tables = iTableService.getTablesByStatus(restaurantId, status, pageable);
-        return new ResponseEntity<>(new ApiResponse<>(tables, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
+        Page<TableResponse> tableResponses = tables.map(this::fromProjectionToDto);
+        return new ResponseEntity<>(new ApiResponse<>(tableResponses, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<ApiResponse<Page<TableProjection>>> filterTables(
+    public ResponseEntity<ApiResponse<Page<TableResponse>>> filterTables(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestBody TableFilterRequest request) {
         if (!securityCheckApisClass.checkApi(authorizationHeader)) {
@@ -119,11 +136,12 @@ public class TableController {
         }
         log.info("POST /api/v1/tables/filter - {}", request);
         Page<TableProjection> tables = iTableService.filterTables(request);
-        return new ResponseEntity<>(new ApiResponse<>(tables, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
+        Page<TableResponse> tableResponses = tables.map(this::fromProjectionToDto);
+        return new ResponseEntity<>(new ApiResponse<>(tableResponses, true, "Tables retrieved successfully", HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/{tableId}")
-    public ResponseEntity<ApiResponse<TableDetailProjection>> getTableById(
+    public ResponseEntity<ApiResponse<TableResponse>> getTableById(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @PathVariable Long tableId) {
         if (!securityCheckApisClass.checkApi(authorizationHeader)) {
@@ -131,7 +149,26 @@ public class TableController {
         }
         log.info("GET /api/v1/tables/{}", tableId);
         TableDetailProjection table = iTableService.getTableById(tableId);
-        return new ResponseEntity<>(new ApiResponse<>(table, true, "Table retrieved successfully", HttpStatus.OK), HttpStatus.OK);
+        TableResponse tableResponse = fromProjectionToDetailDto(table);
+        return new ResponseEntity<>(new ApiResponse<>(tableResponse, true, "Table retrieved successfully", HttpStatus.OK), HttpStatus.OK);
+    }
+
+    private TableResponse fromProjectionToDetailDto(TableDetailProjection table) {
+        // Implementation for converting TableDetailProjection to TableResponse
+        return TableResponse.builder()
+                .id(table.getId())
+                .tableNumber(table.getTableNumber())
+                .capacity(table.getCapacity())
+                .tableStatus(table.getStatus())
+                .tableType(table.getTableType())
+                .location(table.getLocation())
+                .floor(table.getFloor())
+                .section(table.getSection())
+                .active(table.getActive())
+                .notes(table.getNotes())
+                .createdAt(table.getCreatedAt())
+                .updatedAt(table.getUpdatedAt())
+                .build();
     }
 
     @GetMapping("/available")

@@ -1,4 +1,4 @@
-package com.restaurant.user_service.service.restaurant;
+package com.restaurant.user_service.service.restaurant.menu;
 
 import com.restaurant.user_service.dto.ApiResponse;
 import com.restaurant.user_service.dto.menu.request.MenuCategoryRequest;

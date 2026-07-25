@@ -25,7 +25,7 @@ public class SecurityCheckApisClass {
     private final com.restaurant.table_service.repository.ServiceSecurityRepository securityRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     public boolean checkApi(String authorizationHeader) {
-        log.info("Checking API credentials for menu service");
+        log.info("Checking API credentials for table service");
         if (authorizationHeader == null || authorizationHeader.isBlank()) {
             return false;
         }
@@ -41,16 +41,17 @@ public class SecurityCheckApisClass {
             String credentials = new String(decoded, java.nio.charset.StandardCharsets.UTF_8);
             String[] parts = credentials.split(":", 2);
             if (parts.length != 2) {
+
                 return false;
             }
+
             String username = parts[0];
             String password = parts[1];
 
-            // load stored credentials for this service (menu_service)
-            ServiceSecurity security = securityRepository.findByServiceName("menu_service").orElse(null);
+            ServiceSecurity security = securityRepository.findByServiceName("table_service").orElse(null);
             if (security == null) return false;
 
-            String storedUsername = security.getServiceUsername();
+           String storedUsername = security.getServiceUsername();
             String storedPassword = security.getServicePassword();
 
             if (storedUsername == null || storedPassword == null) return false;
@@ -60,6 +61,8 @@ public class SecurityCheckApisClass {
             return passwordEncoder.matches(password, storedPassword);
         } catch (IllegalArgumentException ex) {
             // base64 decode error
+            log.info("Invalid Authorization Header",ex.getMessage());
+
             return false;
         }
     }

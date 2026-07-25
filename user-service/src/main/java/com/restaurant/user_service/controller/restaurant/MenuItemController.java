@@ -4,7 +4,7 @@ import com.restaurant.user_service.dto.ApiResponse;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemRequest;
 import com.restaurant.user_service.dto.menuitems.request.MenuItemUpdateRequest;
 import com.restaurant.user_service.dto.menuitems.response.MenuItemsResponse;
-import com.restaurant.user_service.service.restaurant.IMenuItemService;
+import com.restaurant.user_service.service.restaurant.menu.IMenuItemService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;

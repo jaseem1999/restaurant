@@ -1,4 +1,4 @@
-package com.restaurant.user_service.service.restaurant;
+package com.restaurant.user_service.service.restaurant.menu;
 
 import com.restaurant.user_service.client.MenuClient;
 import com.restaurant.user_service.dto.ApiResponse;
@@ -16,7 +16,6 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

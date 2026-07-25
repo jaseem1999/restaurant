@@ -4,7 +4,7 @@ import com.restaurant.user_service.dto.ApiResponse;
 import com.restaurant.user_service.dto.menuvariant.request.MenuItemVariantRequest;
 import com.restaurant.user_service.dto.menuvariant.request.MenuItemVariantUpdateRequest;
 import com.restaurant.user_service.dto.menuvariant.response.MenuItemVariantResponse;
-import com.restaurant.user_service.service.restaurant.IMenuItemVariantServices;
+import com.restaurant.user_service.service.restaurant.menu.IMenuItemVariantServices;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/menu-item/variants")
+@RequestMapping("/restaurant/menu-item/variants")
 @Validated
 @RequiredArgsConstructor
 public class MenuItemVariantController {
