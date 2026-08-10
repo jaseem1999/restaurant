@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class RestaurantService implements IRestaurantService {
     private final RoleRepository roleRepository;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;;
     private final PasswordEncoder passwordEncoder;
+
 
     public ApiResponse<String> registerRestaurantStaff(RegisterStaffRequest request) {
         log.info("Attempting to register restaurant staff with email: {}", request.getEmail());
@@ -62,17 +64,24 @@ public class RestaurantService implements IRestaurantService {
             log.info("Staff credential created with ID: {}", staffCredential.getId());
 
             // Assign role to staff
-            Roles role = Roles.builder()
-                    .role(request.getRole())
-                    .isActive(true)
-                    .description("Staff role with permissions for " + request.getRole())
-                    .userCredential(staffCredential)
-                    .build();
-            role.setCreatedBy(restaurantOwnerId);
-            role.setCreatedAt(Instant.now());
-            roleRepository.save(role);
 
-            log.info("Role assigned to staff: {}", staffCredential.getId());
+            UserCredential finalStaffCredential = staffCredential;
+            List<Roles> listOfRoles = request.getRoles().stream().map(
+                    role -> {
+                        Roles roles =Roles.builder()
+                                .role(role)
+                                .isActive(true)
+                                .description("Staff role with permissions for " + role)
+                                .userCredential(finalStaffCredential)
+                                .build();
+                        roles.setCreatedBy(restaurantOwnerId);
+                        roles.setCreatedAt(Instant.now());
+                        return roleRepository.save(roles);
+                    }
+            ).toList();
+
+
+            log.info("Role[{}] assigned to staff: {}",listOfRoles.stream().map(r->r.getRole()).collect(Collectors.joining(", ")), staffCredential.getId());
 
             // Create staff details
             UserDetails staffDetails = UserDetails.builder()

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,7 +38,7 @@ public class RegisterStaffRequest {
     @NotBlank(message = "Address is required")
     private String address;
 
-    @NotBlank(message = "Role is required")
-    private String role;
+    @NotEmpty
+    private List<String> roles;
 }
 
