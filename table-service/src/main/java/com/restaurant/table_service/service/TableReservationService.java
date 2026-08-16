@@ -9,7 +9,9 @@ import com.restaurant.table_service.entity.table.Table;
 import com.restaurant.table_service.entity.table.TableAssignment;
 import com.restaurant.table_service.entity.table.TableReservation;
 import com.restaurant.table_service.entity.table.enums.ReservationStatus;
+import com.restaurant.table_service.entity.table.enums.TableStatus;
 import com.restaurant.table_service.repository.TableAssignmentRepository;
+import com.restaurant.table_service.repository.TableRepository;
 import com.restaurant.table_service.request.ReservationFilterRequest;
 import com.restaurant.table_service.repository.TableReservationRepository;
 import com.restaurant.table_service.service.impl.ITableAssignmentService;
@@ -39,6 +41,7 @@ public class TableReservationService implements ITableReservationService {
 
     private final TableReservationRepository reservationRepository;
     private final TableAssignmentRepository assignmentRepository;
+    private final TableRepository tableRepository;
 
      private boolean isTableReserved(Long tableId, Instant assignedAt, Instant vacatedAt) {
         boolean isReserved = reservationRepository.findByTableIdAndStatusIn(tableId, Arrays.asList(ReservationStatus.PENDING, ReservationStatus.CONFIRMED, ReservationStatus.CHECKED_IN)).stream()
@@ -174,6 +177,13 @@ public class TableReservationService implements ITableReservationService {
                 return new ApiResponse<>(null, false, "Table is already assigned", HttpStatus.CONFLICT);
             }
 
+            boolean isTableAvailable = tableRepository.findById(request.getTableId())
+                    .map(table -> table.getStatus() == com.restaurant.table_service.entity.table.enums.TableStatus.AVAILABLE)
+                    .orElse(false);
+            if (!isTableAvailable) {
+                return new ApiResponse<>(null, false, "Table is not available for reservation", HttpStatus.CONFLICT);
+            }
+
             Table table = new Table();
             table.setId(request.getTableId());
             reservation.setTable(table);
@@ -249,12 +259,31 @@ public class TableReservationService implements ITableReservationService {
                     existingReservation.setUpdatedBy(uid);
                     existingReservation.setUpdatedAt(Instant.now());
                     if (request.getStatus() == ReservationStatus.CHECKED_IN) {
+                        log.info("Updating table status to OCCUPIED for table id: {}", existingReservation.getTable().getId());
+                        int rowsUpdated = tableRepository.updateTableStatus(existingReservation.getTable().getId(), TableStatus.OCCUPIED);
+                        if (rowsUpdated == 0) {
+                            throw new RuntimeException("Failed to update table status");
+                        }
+                        log.info("Setting check-in date and time {} for reservation id: {}", Instant.now(), existingReservation.getId());
                         existingReservation.setCheckInDateTime(Instant.now());
                     } else if (request.getStatus() == ReservationStatus.COMPLETED) {
+                        log.info("Updating table status to CLEANING for table id: {}", existingReservation.getTable().getId());
+                        int rowsUpdated = tableRepository.updateTableStatus(existingReservation.getTable().getId(), TableStatus.CLEANING);
+                        if (rowsUpdated == 0) {
+                            throw new RuntimeException("Failed to update table status");
+                        }
+                        log.info("Setting check-out date and time {} for reservation id: {}", Instant.now(), existingReservation.getId());
                         existingReservation.setCheckOutDateTime(Instant.now());
                     } else if (request.getStatus() == ReservationStatus.CANCELLED) {
+                        log.info("Updating table status to AVAILABLE for table id: {}", existingReservation.getTable().getId());
+                        int rowsUpdated = tableRepository.updateTableStatus(existingReservation.getTable().getId(), TableStatus.AVAILABLE);
+                        if (rowsUpdated == 0) {
+                            throw new RuntimeException("Failed to update table status");
+                        }
+                        log.info("Setting no-show flag to true for reservation id: {}", existingReservation.getId());
                         existingReservation.setNoShow(true);
                     } else if (request.getStatus() == ReservationStatus.CONFIRMED) {
+                        log.info("Setting no-show flag to false for reservation id: {}", existingReservation.getId());
                         existingReservation.setNoShow(false);
                     }
                     reservation.set(reservationRepository.save(existingReservation));

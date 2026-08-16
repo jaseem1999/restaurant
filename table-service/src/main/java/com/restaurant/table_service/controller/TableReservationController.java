@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +37,9 @@ public class TableReservationController {
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestBody ReservationRequest request
     ){
+        if(!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         ApiResponse<ReservationResponse> response = reservationService.createReservation(request);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -46,6 +50,9 @@ public class TableReservationController {
             @PathVariable Long reservationId,
             @RequestBody ReservationRequest request
     ){
+        if(!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         ApiResponse<ReservationResponse> response = reservationService.updateReservation(reservationId, request);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -56,6 +63,9 @@ public class TableReservationController {
             @RequestParam ReservationStatus status,
             @RequestParam Long uid
     ){
+        if(!securityCheckApisClass.checkApi(authorizationHeader)) {
+            return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
         ReservationRequest request = new ReservationRequest();
         request.setStatus(status);
         ApiResponse<ReservationResponse> response = reservationService.updateReservationStatus(reservationId, request, uid);
@@ -70,7 +80,9 @@ public class TableReservationController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size) {
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            securityCheckApisClass.checkApi(authorizationHeader);
+            if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+                return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+            }
         }
         log.info("GET /api/v1/reservations - restaurantId: {}, page: {}, size: {}", restaurantId, page, size);
         Pageable pageable = PageRequest.of(page, size);
@@ -88,7 +100,9 @@ public class TableReservationController {
             @RequestParam(defaultValue = "20") Integer size) {
         log.info("GET /api/v1/reservations/status/{} - restaurantId: {}", status, restaurantId);
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            securityCheckApisClass.checkApi(authorizationHeader);
+            if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+                return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+            }
         }
         Pageable pageable = PageRequest.of(page, size);
         ApiResponse<Page<ReservationProjection>> reservations = reservationService.getReservationsByStatus(restaurantId, status, pageable);
@@ -103,7 +117,9 @@ public class TableReservationController {
             @RequestParam(defaultValue = "20") Integer size) {
         log.info("GET /api/v1/reservations/customer/{}", customerId);
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            securityCheckApisClass.checkApi(authorizationHeader);
+            if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+                return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+            }
         }
         Pageable pageable = PageRequest.of(page, size);
         ApiResponse<Page<ReservationProjection>> reservations = reservationService.getCustomerReservations(customerId, pageable);
@@ -119,7 +135,9 @@ public class TableReservationController {
             @RequestParam(defaultValue = "20") Integer size) {
         log.info("GET /api/v1/reservations/customer/{}/restaurant/{}", customerId, restaurantId);
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            securityCheckApisClass.checkApi(authorizationHeader);
+            if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+                return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+            }
         }
         Pageable pageable = PageRequest.of(page, size);
         ApiResponse<Page<ReservationProjection>> reservations = reservationService.getCustomerReservationsByRestaurant(customerId, restaurantId, pageable);
@@ -132,7 +150,9 @@ public class TableReservationController {
             @RequestBody ReservationFilterRequest request) {
         log.info("POST /api/v1/reservations/filter - {}", request);
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            securityCheckApisClass.checkApi(authorizationHeader);
+            if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+                return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+            }
         }
         ApiResponse<Page<ReservationProjection>> reservations = reservationService.filterReservations(request);
         return new ResponseEntity<>(reservations, reservations.getStatus());
@@ -145,7 +165,9 @@ public class TableReservationController {
 
         log.info("GET /api/v1/reservations/{}", reservationId);
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            securityCheckApisClass.checkApi(authorizationHeader);
+            if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+                return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+            }
         }
         ApiResponse<ReservationDetailProjection> reservation = reservationService.getReservationById(reservationId);
         return new ResponseEntity<>(reservation, reservation.getStatus());
@@ -159,7 +181,9 @@ public class TableReservationController {
             @RequestParam LocalDateTime toDate) {
         log.info("GET /api/v1/reservations/pending - restaurantId: {}, fromDate: {}, toDate: {}", restaurantId, fromDate, toDate);
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            securityCheckApisClass.checkApi(authorizationHeader);
+            if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+                return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+            }
         }
         ApiResponse<List<ReservationProjection>> reservations = reservationService.getPendingReservations(restaurantId, fromDate, toDate);
         return new ResponseEntity<>(reservations, reservations.getStatus());
@@ -173,7 +197,9 @@ public class TableReservationController {
             @RequestParam LocalDateTime toDate) {
         log.info("GET /api/v1/reservations/confirmed - restaurantId: {}, fromDate: {}, toDate: {}", restaurantId, fromDate, toDate);
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            securityCheckApisClass.checkApi(authorizationHeader);
+            if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+                return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+            }
         }
         ApiResponse<List<ReservationProjection>> reservations = reservationService.getConfirmedReservations(restaurantId, fromDate, toDate);
         return new ResponseEntity<>(reservations, reservations.getStatus());
@@ -187,7 +213,9 @@ public class TableReservationController {
             @RequestParam LocalDateTime toDate) {
         log.info("GET /api/v1/reservations/no-show - restaurantId: {}, fromDate: {}, toDate: {}", restaurantId, fromDate, toDate);
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            securityCheckApisClass.checkApi(authorizationHeader);
+            if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+                return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+            }
         }
         ApiResponse<List<ReservationProjection>> reservations = reservationService.getNoShowReservations(restaurantId, fromDate, toDate);
         return new ResponseEntity<>(reservations, reservations.getStatus());
@@ -200,7 +228,9 @@ public class TableReservationController {
             @RequestParam ReservationStatus status) {
         log.info("GET /api/v1/reservations/count-by-status - restaurantId: {}, status: {}", restaurantId, status);
         if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-            securityCheckApisClass.checkApi(authorizationHeader);
+            if (!securityCheckApisClass.checkApi(authorizationHeader)) {
+                return new ResponseEntity<>(new ApiResponse<>(null, false, "Unauthorized", HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+            }
         }
         ApiResponse<Long> count = reservationService.getReservationCountByStatus(restaurantId, status);
         return new ResponseEntity<>(count, count.getStatus());

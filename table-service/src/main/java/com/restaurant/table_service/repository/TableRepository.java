@@ -6,9 +6,11 @@ import com.restaurant.table_service.entity.table.enums.TableType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -74,4 +76,16 @@ public interface TableRepository extends JpaRepository<Table, Long> {
     Long countByRestaurantIdAndStatus(Long restaurantId, TableStatus status);
 
     Long countByRestaurantIdAndStatusAndActive(Long restaurantId, TableStatus status, Boolean active);
+
+    @Modifying
+    @Transactional
+    @Query("""
+    UPDATE Table t
+    SET t.status = :status
+    WHERE t.id = :tableId
+""")
+    int updateTableStatus(
+            @Param("tableId") Long tableId,
+            @Param("status") TableStatus status
+    );
 }

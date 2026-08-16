@@ -40,7 +40,7 @@ public class MenuCategoryController {
      * @param request
      * @return
      */
-    @PostMapping("/create")
+    @PostMapping("/categories/create")
     public ResponseEntity<ApiResponse<MenuCategoryResponse>> createMenu(
             @RequestBody MenuCategoryRequest request
             ) {

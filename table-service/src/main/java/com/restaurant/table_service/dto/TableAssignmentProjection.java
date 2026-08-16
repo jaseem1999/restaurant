@@ -21,4 +21,8 @@ public class TableAssignmentProjection {
     private Instant assignedAt;
     private Instant vacatedAt;
     private Boolean active;
+    private Instant createdAt;
+    private Long createdBy;
+    private Instant updatedAt;
+    private Long updatedBy;
 }

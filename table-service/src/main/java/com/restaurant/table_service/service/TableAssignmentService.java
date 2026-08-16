@@ -1,5 +1,6 @@
 package com.restaurant.table_service.service;
 
+import com.restaurant.table_service.client.OrderClient;
 import com.restaurant.table_service.dto.ApiResponse;
 import com.restaurant.table_service.dto.TableAssignmentDetailProjection;
 import com.restaurant.table_service.dto.TableAssignmentProjection;
@@ -7,6 +8,8 @@ import com.restaurant.table_service.dto.table_assignment.request.TableAssignment
 import com.restaurant.table_service.entity.table.Table;
 import com.restaurant.table_service.entity.table.TableAssignment;
 import com.restaurant.table_service.entity.table.enums.ReservationStatus;
+import com.restaurant.table_service.entity.table.enums.TableStatus;
+import com.restaurant.table_service.repository.TableRepository;
 import com.restaurant.table_service.repository.TableReservationRepository;
 import com.restaurant.table_service.request.TableAssignmentFilterRequest;
 import com.restaurant.table_service.repository.TableAssignmentRepository;
@@ -35,6 +38,8 @@ public class TableAssignmentService implements ITableAssignmentService {
 
     private final TableAssignmentRepository assignmentRepository;
     private final TableReservationRepository reservationRepository;
+    private final TableRepository tableRepository;
+    private final OrderClient orderClient;
 
     private boolean isTableAssigned(Long tableId, Instant checkInDateTime, Instant checkOutDateTime) {
         log.info("Checking if table {} is assigned between {} and {}", tableId, checkInDateTime, checkOutDateTime);
@@ -55,6 +60,7 @@ public class TableAssignmentService implements ITableAssignmentService {
                     Instant reservationEnd = reservation.getCheckOutDateTime() != null ? reservation.getCheckOutDateTime() : reservationStart.plusSeconds(3600); // Assuming 1 hour if check-out is not set
                     return (assignedAt.isBefore(reservationEnd) && vacatedAt.isAfter(reservationStart));
                 });
+
         return isReserved;
     }
 
@@ -154,6 +160,11 @@ public class TableAssignmentService implements ITableAssignmentService {
     @Override
     public ApiResponse<TableAssignmentProjection> createTableAssignment(TableAssignmentRequest tableAssignmentRequest) {
         log.info("Creating new table assignment with request: {}", tableAssignmentRequest);
+        // TODO: Check if the order exists using the OrderClient currently service not implemented
+        boolean isOrderExists = orderClient.checkOrderExists(tableAssignmentRequest.getOrderId());
+        if(!isOrderExists) {
+            return new ApiResponse<>(null, false, "ORDER_NOT_FOUND", HttpStatus.NOT_FOUND);
+        }
         TableAssignment assignment = TableAssignment.builder()
                 .orderId(tableAssignmentRequest.getOrderId())
                 .customerId(tableAssignmentRequest.getCustomerId())
@@ -171,18 +182,43 @@ public class TableAssignmentService implements ITableAssignmentService {
             if (checkIsAlreadyReserved) {
                 return new ApiResponse<>(null, false, "Table is already reserved for the given period", HttpStatus.NOT_ACCEPTABLE);
             }
-            boolean checkIsAlreadyAssignedGivenPeriod = assignmentRepository.findByTableIdAndActive(tableAssignmentRequest.getTableId(), true)
-                    .stream()
-                    .anyMatch(existingAssignment -> {
-                        if (existingAssignment.getVacatedAt() == null) {
-                            return true; // Table is currently assigned
-                        }
-                        // Check for overlapping periods
-                        return !(tableAssignmentRequest.getAssignedAt().isAfter(existingAssignment.getVacatedAt()) ||
-                                tableAssignmentRequest.getVacatedAt().isBefore(existingAssignment.getAssignedAt()));
-                    });
+            Instant requestedStart = tableAssignmentRequest.getAssignedAt();
+
+            Instant requestedEnd = tableAssignmentRequest.getVacatedAt() != null
+                    ? tableAssignmentRequest.getVacatedAt()
+                    : requestedStart.plusSeconds(3600);
+
+            boolean checkIsAlreadyAssignedGivenPeriod =
+                    assignmentRepository
+                            .findByTableIdAndActive(
+                                    tableAssignmentRequest.getTableId(),
+                                    true
+                            )
+                            .stream()
+                            .anyMatch(existingAssignment -> {
+
+                                Instant existingStart =
+                                        existingAssignment.getAssignedAt();
+
+                                Instant existingEnd =
+                                        existingAssignment.getVacatedAt() != null
+                                                ? existingAssignment.getVacatedAt()
+                                                : existingStart.plusSeconds(3600);
+
+                                // Check overlapping periods
+                                return requestedStart.isBefore(existingEnd)
+                                        && requestedEnd.isAfter(existingStart);
+                            });
+
             if (checkIsAlreadyAssignedGivenPeriod) {
                 return new ApiResponse<>(null, false, "Table is already assigned for the given period", HttpStatus.NOT_ACCEPTABLE);
+            }
+            boolean isTableAvailable = tableRepository.findById(tableAssignmentRequest.getTableId())
+                    .map(table -> table.getStatus() == TableStatus.AVAILABLE || tableAssignmentRequest.getAssignedAt().isAfter(Instant.now()))
+                    .orElse(false);
+
+            if (!isTableAvailable) {
+                return new ApiResponse<>(null, false, "Selected table is not available", HttpStatus.NOT_ACCEPTABLE);
             }
             Table table = new Table();
             table.setId(tableAssignmentRequest.getTableId());
@@ -194,6 +230,10 @@ public class TableAssignmentService implements ITableAssignmentService {
         assignment.setCreatedAt(Instant.now());
         assignment.setCreatedBy(tableAssignmentRequest.getCreatedBy());
         TableAssignment savedAssignment = assignmentRepository.save(assignment);
+        int rowsUpdated = tableRepository.updateTableStatus(tableAssignmentRequest.getTableId(), TableStatus.OCCUPIED);
+        if (rowsUpdated == 0) {
+            throw new RuntimeException("Failed to update table status");
+        }
         return new ApiResponse<>(mapToTableAssignmentProjection(savedAssignment), true, "created successfully", HttpStatus.CREATED);
     }
 
@@ -205,6 +245,11 @@ public class TableAssignmentService implements ITableAssignmentService {
                 .orElseThrow(() -> new RuntimeException("Assignment not found with id: " + assignmentId));
         if (!assignment.getActive()) {
             return new ApiResponse<>(null, false, "Assignment is already vacated", HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        int rowsUpdated = tableRepository.updateTableStatus(assignment.getTable().getId(), TableStatus.AVAILABLE);
+        if (rowsUpdated == 0) {
+            throw new RuntimeException("Failed to update table status");
         }
         assignment.setActive(false);
         assignment.setUpdatedAt(Instant.now());
@@ -243,6 +288,12 @@ public class TableAssignmentService implements ITableAssignmentService {
             if (checkIsAlreadyAssignedGivenPeriod) {
                 return new ApiResponse<>(null, false, "Table is already assigned for the given period", HttpStatus.CONFLICT);
             }
+            boolean isTableAvailable = tableRepository.findById(tableAssignmentRequest.getTableId())
+                    .map(table -> table.getStatus() == TableStatus.AVAILABLE)
+                    .orElse(false);
+            if (!isTableAvailable) {
+                return new ApiResponse<>(null, false, "Selected table is not available", HttpStatus.NOT_ACCEPTABLE);
+            }
         }
         assignment.setUpdatedBy(tableAssignmentRequest.getUpdatedBy());
         assignment.setUpdatedAt(Instant.now());
@@ -262,6 +313,10 @@ public class TableAssignmentService implements ITableAssignmentService {
         return TableAssignmentProjection.builder()
                 .id(assignment.getId())
                 .orderId(assignment.getOrderId())
+                .createdAt(assignment.getCreatedAt())
+                .createdBy(assignment.getCreatedBy())
+                .updatedAt(assignment.getUpdatedAt())
+                .updatedBy(assignment.getUpdatedBy())
                 .customerId(assignment.getCustomerId())
                 .tableId(assignment.getTable() != null ? assignment.getTable().getId() : null)
                 .tableNumber(assignment.getTable() != null ? assignment.getTable().getTableNumber() : null)

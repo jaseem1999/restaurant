@@ -28,7 +28,12 @@ public class MenuService implements IMenuCategoryService {
 
     @Override
     public ApiResponse<MenuCategoryResponse> createMenuCategory(MenuCategoryRequest request) {
-
+        UserCredentialProjection userCredential = userCredentialRepository.findUserCredentialByEmail(jwtAuthenticationFilter.getCurrentUserEmail())
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException(
+                        "User credentials not found for email: " + jwtAuthenticationFilter.getCurrentUserEmail()
+                ));
+        request.setCreatedBy(userCredential.getId());
+        request.setRestaurantId(userCredential.getRestaurantId());
         try {
             return menuClient.createMenuCategory(request);
 

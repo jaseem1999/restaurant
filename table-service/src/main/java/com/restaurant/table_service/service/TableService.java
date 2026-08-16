@@ -8,6 +8,7 @@ import com.restaurant.table_service.entity.table.Table;
 import com.restaurant.table_service.entity.table.enums.TableStatus;
 import com.restaurant.table_service.request.TableFilterRequest;
 import com.restaurant.table_service.repository.TableRepository;
+import com.restaurant.table_service.security.SecurityCheckApisClass;
 import com.restaurant.table_service.service.impl.ITableService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

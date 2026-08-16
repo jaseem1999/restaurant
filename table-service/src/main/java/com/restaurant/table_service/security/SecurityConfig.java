@@ -27,7 +27,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs",
                                 "/webjars/**",
-                                "/api/v1/tables/**"
+                                "/api/v1/tables/**",
+                                "/api/v1/assignments/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
